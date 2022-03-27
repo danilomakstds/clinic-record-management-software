@@ -1,0 +1,8 @@
+{
+  "name": "Clinic Record Management Software",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue",
+  "id": "a21ae7dc"
+}
