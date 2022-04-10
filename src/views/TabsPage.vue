@@ -1,41 +1,182 @@
 <template>
-  <ion-page>
+<ion-page>
     <ion-tabs>
-      <ion-router-outlet></ion-router-outlet>
-      <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="tab1" href="/tabs/tab1">
-          <ion-icon :icon="triangle" />
-          <ion-label>Tab 1</ion-label>
-        </ion-tab-button>
-          
-        <ion-tab-button tab="tab2" href="/tabs/tab2">
-          <ion-icon :icon="ellipse" />
-          <ion-label>Tab 2</ion-label>
-        </ion-tab-button>
-        
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
-          <ion-icon :icon="square" />
-          <ion-label>Tab 3</ion-label>
-        </ion-tab-button>
-      </ion-tab-bar>
+        <ion-router-outlet id="main"></ion-router-outlet>
+        <ion-tab-bar slot="bottom">
+            <ion-tab-button tab="tab1" href="/tabs/appointment">
+                <ion-icon :icon="calendarOutline" />
+                <ion-label>Appointment</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="tab2" href="/tabs/patients" v-if="sessionData.user_level > 0">
+                <ion-icon :icon="personAddOutline" />
+                <ion-label>Patients</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="tab3" href="/tabs/inventory" v-if="sessionData.user_level > 0">
+                <ion-icon :icon="listOutline" />
+                <ion-label>Drug Inventory</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="tab4" href="/tabs/prescription" v-if="sessionData.user_level == 0">
+                <ion-icon :icon="documentOutline" />
+                <ion-label>Prescriptions</ion-label>
+            </ion-tab-button>
+
+            <ion-tab-button tab="tab5" @click="openFirst()">
+                <ion-icon :icon="optionsOutline" />
+                <ion-label>Options</ion-label>
+            </ion-tab-button>
+        </ion-tab-bar>
     </ion-tabs>
-  </ion-page>
+</ion-page>
+<ion-menu side="start" menu-id="first" content-id="main">
+    <ion-header>
+        <ion-toolbar color="primary">
+            <ion-title>Menu Options</ion-title>
+        </ion-toolbar>
+    </ion-header>
+    <ion-content>
+        <ion-list>
+            <ion-item @click="logOutUserModal()">
+                <ion-icon :icon="logOutOutline" slot="start" />
+                <ion-label>Logout</ion-label>
+            </ion-item>
+        </ion-list>
+        <ion-list v-if="sessionData.user_level > 0">
+            <ion-item>
+                <ion-toggle color="primary" slot="start" @ionChange="onChangeToggle()" v-model="isToday"></ion-toggle>
+                <ion-label>Today's Appointments</ion-label>
+            </ion-item>
+        </ion-list>
+    </ion-content>
+</ion-menu>
 </template>
 
-<script lang="ts">
+<script lang="js">
 import { defineComponent } from 'vue';
-import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
-import { ellipse, square, triangle } from 'ionicons/icons';
+
+import {
+    IonTabBar,
+    IonTabButton,
+    IonTabs,
+    IonLabel,
+    IonIcon,
+    IonPage,
+    IonRouterOutlet,
+    IonContent,
+    IonHeader,
+    IonItem,
+    IonList,
+    IonMenu,
+    IonTitle,
+    IonToolbar,
+    menuController,
+    alertController,
+    IonToggle
+} from '@ionic/vue';
+
+import {
+    optionsOutline,
+    calendar,
+    personAdd,
+    list,
+    document,
+    calendarOutline,
+    personAddOutline,
+    listOutline,
+    documentOutline,
+    logOutOutline
+} from 'ionicons/icons';
+import { mapState } from 'vuex'
+import store from '../store'
 
 export default defineComponent({
-  name: 'TabsPage',
-  components: { IonLabel, IonTabs, IonTabBar, IonTabButton, IonIcon, IonPage, IonRouterOutlet },
-  setup() {
-    return {
-      ellipse, 
-      square, 
-      triangle,
-    }
-  }
+    name: 'TabsPage',
+    data() {
+        return {
+            isToday: false
+        }
+    },
+    computed: mapState([
+        'sessionData',
+        'isAppointmentListToday'
+    ]),
+    components: {
+        IonLabel,
+        IonTabs,
+        IonTabBar,
+        IonTabButton,
+        IonIcon,
+        IonPage,
+        IonRouterOutlet,
+        IonContent,
+        IonHeader,
+        IonItem,
+        IonList,
+        IonMenu,
+        IonTitle,
+        IonToolbar,
+        IonToggle
+    },
+    setup() {
+        return {
+            calendar,
+            personAdd,
+            list,
+            document,
+            calendarOutline,
+            personAddOutline,
+            listOutline,
+            documentOutline,
+            optionsOutline,
+            logOutOutline,
+        }
+    },
+    methods: {
+        openFirst() {
+            menuController.open('first');
+        },
+        onChangeToggle: function () {
+            store.commit('SET_TODAY_APPOINTMENT_LIST', this.isToday);
+            this.emitter.emit('isTodayChanged');
+        },
+        logOutUser: function () {
+            store.commit('RESET_SESSION_DATA');
+            if (!this.sessionData) {
+                location.href = "/login";
+            }
+        },
+        async logOutUserModal() {
+            const alert = await alertController
+                .create({
+                    cssClass: 'my-custom-class',
+                    header: 'Log Out!',
+                    message: 'Are you sure you would like to <strong>log out</strong>!',
+                    buttons: [{
+                            text: 'Cancel',
+                            role: 'cancel',
+                            cssClass: 'secondary',
+                            id: 'cancel-button',
+                            handler: blah => {
+                                console.log('Confirm Cancel:', blah)
+                            },
+                        },
+                        {
+                            text: 'Logout',
+                            id: 'confirm-button',
+                            handler: () => {
+                                console.log('Confirm Okay');
+                                this.logOutUser();
+                            },
+                        },
+                    ],
+                });
+            return alert.present();
+        },
+    },
+    mounted() {
+      this.isToday = this.isAppointmentListToday;
+    },
 });
 </script>

@@ -1,0 +1,121 @@
+<template>
+  <ion-page>
+    <ion-content :fullscreen="true">
+
+      <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
+      <ion-header collapse="condense">
+      </ion-header>
+      <div class="p-4">
+        <div class="text-center mb-5">
+        <img src="../../resources/logo.png" style="height: 200px" class="mb-3"/>
+        <h5 style="margin:0 auto">{{sofwareName}}</h5>
+        </div>
+        <!-- show alert message here -->
+        <div class="alert fade show mb-4 text-start" role="alert" :class="messageType" v-if="message" v-html="message"></div>
+        <form class="text-start" @submit="checkIfUserExist">
+          <div class="mb-3">
+            <ion-label class="text-dark">Email address</ion-label>
+            <input type="email" class="form-control form-control-lg" id="exampleFormControlInput1" v-model="userEmail">
+          </div>
+          <div class="mb-3">
+            <ion-label class="text-dark">Password</ion-label>
+            <input type="password" class="form-control form-control-lg" id="exampleFormControlInput1" v-model="userPassword">
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-100">Login</button>
+        </form>
+        <div class="text-center mt-2">
+          Or<br/>
+          <a href="/register" class="text-decoration-none">Create account</a>
+        </div>
+        
+        <!-- <form class="text-start" @submit="checkIfUserExist">
+          <ion-item class="mb-2">
+            <ion-label position="floating">Email address</ion-label>
+            <ion-input type="email" :value="userEmail" @ionInput="userEmail = $event.target.value"></ion-input>
+          </ion-item>
+          <ion-item class="mb-2">
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password" :value="userPassword" @ionInput="userPassword = $event.target.value"></ion-input>
+          </ion-item>
+          <ion-button expand="block" color="primary" type="submit">Login</ion-button>
+        </form> -->
+      </div>
+    </ion-content>
+  </ion-page>
+</template>
+
+<script lang="js">
+import { defineComponent } from 'vue';
+import { IonPage, IonHeader, IonContent, IonLabel, IonRefresher, IonRefresherContent } from '@ionic/vue';
+import { chevronDownCircleOutline } from 'ionicons/icons';
+import SettingsConstants from '../constants/settings.constants';
+import axios from "axios";
+import store from '../store';
+import { mapState } from 'vuex';
+
+export default  defineComponent({
+  name: 'LoginPage',
+  computed: mapState([
+      'sessionData'
+  ]),
+  setup() {
+    const doRefresh = function (event) {
+      location.reload(true);
+      setTimeout(function () {
+        event.target.complete();
+      }, 2000);
+    }
+    return { chevronDownCircleOutline, doRefresh }
+  },
+  data() {
+    return {
+      userEmail: null,
+      userPassword: null,
+      showMessage: false,
+      message: null,
+      messageType: null,
+      sofwareName: null
+    }
+  },
+  components: { IonHeader, IonContent, IonPage, IonLabel, IonRefresher, IonRefresherContent },
+  methods: {
+    checkIfUserExist: function () {
+      event.preventDefault();
+      var bodyFormData = new FormData();
+      bodyFormData.append('user_email', this.userEmail);
+      bodyFormData.append('user_password', this.userPassword);
+      axios({
+          method: "post",
+          url: SettingsConstants.BASE_URL + "users.rest.php?type=login",
+          data: bodyFormData,
+          headers: { "Content-Type": "multipart/form-data" },
+      })
+          .then(function (response) {
+            if (response.data.length == 1) {
+                this.showMessage = true;
+                this.message = "<strong>Success! </strong>";
+                this.messageType = "alert-success";
+                //start session
+                store.commit('SET_SESSION_DATA', response.data[0]);
+                if (this.sessionData) {
+                    window.location.href = '/tabs';
+                }
+            } else {
+                this.showMessage = true;
+                this.message = "<strong>Error! </strong> No user found matching email and password!";
+                this.messageType = "alert-danger";
+            }
+          }.bind(this))
+          .catch(function (response) {
+              console.log(response);
+          });
+    }
+  },
+  mounted() {
+    this.sofwareName = SettingsConstants.SOFTWARE_NAME;
+  },
+});
+</script>
