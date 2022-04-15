@@ -328,7 +328,7 @@ export default  defineComponent({
                   .then(function (response) {
                     if (response.data) {
                       var resp = response.data[0];
-                      app.fullName = resp.user_lastname + ' ' + resp.user_firstname + (resp.user_middlename ? ' '+resp.user_middlename : '');
+                      app.fullName = resp.user_lastname + ', ' + resp.user_firstname + (resp.user_middlename ? ' '+resp.user_middlename : '');
                     }
                   }.bind(app));
                   switch(parseInt(app.app_apptype)){

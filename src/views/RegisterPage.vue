@@ -189,10 +189,12 @@ export default  defineComponent({
   name: 'RegisterPage',
   watch: {
     userEmail: function (newVal) {
-      this.allEmails = this.allEmailsTemp;
-      var counter = [];
-      counter = this.allEmails.filter(email => email.user_email.toLowerCase() == newVal.toLowerCase());
-      !counter.length ? this.isEmailValid = true : this.isEmailValid = false ;
+      if (newVal) {
+        this.allEmails = this.allEmailsTemp;
+        var counter = [];
+        counter = this.allEmails.filter(email => email.user_email.toLowerCase() == newVal.toLowerCase());
+        !counter.length ? this.isEmailValid = true : this.isEmailValid = false ;
+      }
     }
   },
   setup() {
@@ -256,7 +258,23 @@ export default  defineComponent({
                   'Great!',
                   'Account has been created!',
                   'success'
-                );
+                ).then(function (){
+                    this.userEmail = null,
+                    this.userPassword = null;
+                    this.userConfirmPassword = null;
+                    this.userFirstname = null;
+                    this.userLastname = null;
+                    this.userMiddlename = null;
+                    this.userSuffix = null;
+                    this.userSex = 1;
+                    this.userAddress = null;
+                    this.userCity = null;
+                    this.userProvince = null;
+                    this.userContact = null;
+                    this.userDateofbirth = null;
+                    this.userMaritalstatus = 1;
+                }.bind(this));
+
             } else {
                 Swal.fire(
                   'Error!',
