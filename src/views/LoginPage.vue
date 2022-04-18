@@ -30,18 +30,6 @@
           Or<br/>
           <a href="/register" class="text-decoration-none">Create account</a>
         </div>
-        
-        <!-- <form class="text-start" @submit="checkIfUserExist">
-          <ion-item class="mb-2">
-            <ion-label position="floating">Email address</ion-label>
-            <ion-input type="email" :value="userEmail" @ionInput="userEmail = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-item class="mb-2">
-            <ion-label position="floating">Password</ion-label>
-            <ion-input type="password" :value="userPassword" @ionInput="userPassword = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-button expand="block" color="primary" type="submit">Login</ion-button>
-        </form> -->
       </div>
     </ion-content>
   </ion-page>

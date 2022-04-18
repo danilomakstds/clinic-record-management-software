@@ -80,6 +80,22 @@ switch ($_GET['type']) {
          print(0);
       }
       break;
+   case 'loginadmin':
+      $user_email = $_POST['user_email'];
+      $user_password = $_POST['user_password'];
+      $sqlString = "SELECT * FROM `users` WHERE user_password = '{$user_password}' AND user_email = '{$user_email}' AND user_level = 3";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
    case 'addpatient':
       $user_email = $_POST['user_email'];
       $user_password = $_POST['user_password'];

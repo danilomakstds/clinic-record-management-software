@@ -81,8 +81,6 @@
           </ion-card-content>
         </ion-card>
 
-
-
         <ion-modal
         :is-open="isAppointmentModalOpen"
         @didDismiss="toggleAppointmentModal()"
