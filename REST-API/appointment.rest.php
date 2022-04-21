@@ -22,6 +22,24 @@ switch ($_GET['type']) {
          print(0);
       }
       break;
+   case 'everything':
+         $sqlString = "SELECT * FROM `appointment`";
+         if (!empty($_GET['isToday'])) {
+            $today = $_GET['isToday'];
+            $sqlString = "SELECT * FROM `appointment` WHERE app_date like '%$today%'";
+         }
+         $rs = mysqli_query($con, $sqlString);
+         if(mysqli_num_rows($rs) > 0){
+            while($objRs = mysqli_fetch_array($rs)){
+               $output[] = $objRs;
+            }
+            
+            $json = json_encode($output);
+            print($json);
+         } else {
+            print(0);
+         }
+         break;
    case 'allbyId':
       $sqlString = "SELECT * FROM `appointment` WHERE app_userId = '{$_GET['userId']}' AND app_status = 0";
       $rs = mysqli_query($con, $sqlString);
@@ -97,6 +115,25 @@ switch ($_GET['type']) {
       } else {
          print(0);
       }
+      break;
+   case 'deleteappointment':
+      $appid = $_GET['appid'];
+      $sqlString = "DELETE FROM `appointment` WHERE `appointment`.`id` = '{$appid}'";
+      $rs = mysqli_query($con, $sqlString);
+      echo(mysqli_affected_rows($con));
+      break;
+   case 'updateappointment':
+      $app_type = $_POST['app_type'];
+      $app_timeslot = $_POST['app_timeslot'];
+      $app_date = $_POST['app_date'];
+      $app_id = $_GET['app_id'];
+
+      $sqlString = "UPDATE `appointment` SET
+      `app_apptype` = '{$app_type}',
+      `app_timeslot` = '{$app_timeslot}',
+      `app_date` = '{$app_date}' WHERE `appointment`.`id` = '{$app_id}'";
+      $rs = mysqli_query($con, $sqlString);
+      echo(mysqli_affected_rows($con));
       break;
 }
 mysqli_close($con);
