@@ -37,6 +37,8 @@
             
             <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>{{app.convertedDate}}<br/>
             <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>{{app.timeSlot}}<br/>
+            <span class="badge rounded-pill bg-secondary mt-4" style="font-size: 13px" v-if="app.app_status == 0">Created</span>
+            <span class="badge rounded-pill bg-primary mt-4" style="font-size: 13px" v-if="app.app_status == 1">Doctor's Queue</span>
           </ion-card-content>
         </ion-card>
 
@@ -84,6 +86,7 @@
         <ion-modal
         :is-open="isAppointmentModalOpen"
         @didDismiss="toggleAppointmentModal()"
+        :tabindex="none"
       >
         <ion-content>
           <ion-datetime presentation="date" @ionChange="checkForEnabledSlots()" v-model="selectedDate">
@@ -134,7 +137,7 @@
           </ion-header>
           <ion-content>
             <div class="p-4">
-              <form @submit="savePrescription()">
+              <form>
                 <ion-list>
                   <ion-item>
                     <ion-icon :icon="personCircleOutline" slot="start" class="me-2"></ion-icon>
@@ -149,13 +152,50 @@
                     <ion-label>{{apdModalData.convertedDate}}</ion-label>
                   </ion-item>
                   <ion-item>
-                    <ion-label>
-                      <h5><strong>Patient's Concern</strong></h5>
-                      <div>
-                        <textarea class="form-control" style="height:100px; border-radius: 15px" v-model="appConcern" required></textarea>
+                    <ion-icon :icon="informationCircleOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><strong>Symptoms / Concerns: </strong><br/> {{apdModalData.app_patientconcerns}}</ion-label>
+                  </ion-item>
+                  <span v-if="sessionData.user_level == 2">
+                  <ion-item>
+                    <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><strong>Height: </strong> {{apdModalData.app_patient_height}} cm</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><strong>Weight: </strong> {{apdModalData.app_patient_weight}} kg</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><strong>Blood Pressure: </strong> {{apdModalData.app_patient_bp}}</ion-label>
+                  </ion-item>
+                  </span>
+                </ion-list>
+
+
+                <ion-list v-if="sessionData.user_level == 1">
+                  <ion-item>
+                    <ion-label><h4 class="mb-3"><strong>Weight (kg)</strong></h4>
+                      <div class="w-100 pe-3">
+                        <input type="number" class="form-control form-control-lg m-2 w-100" v-model="patientWeight"/>
                       </div>
                     </ion-label>
                   </ion-item>
+                  <ion-item>
+                    <ion-label><h4 class="mb-3"><strong>Height (cm)</strong></h4>
+                      <div class="w-100 pe-3">
+                        <input type="number" class="form-control form-control-lg m-2 w-100" v-model="patientHeight"/>
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label><h4 class="mb-3"><strong>Blood Pressure</strong></h4>
+                      <div class="w-100 pe-3">
+                        <input type="text" class="form-control form-control-lg m-2 w-100" v-model="patientBP"/>
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+                <ion-list v-if="sessionData.user_level == 2">
                   <ion-item>
                     <ion-label>
                       <h5><strong>Diagnosis</strong></h5>
@@ -173,9 +213,13 @@
                     </ion-label>
                   </ion-item>
                 </ion-list>
-                <button type="button" class="btn btn-primary w-100 btn-lg" @click="concernAddressed(apdModalData)">
+                <button type="button" class="btn btn-primary w-100 btn-lg" @click="concernAddressed(apdModalData)" v-if="apdModalData.app_status == 1">
                   <ion-icon :icon="checkmarkOutline" slot="start" class="me-2"></ion-icon>
-                  Marked Done
+                  Mark as Done
+                </button>
+                <button type="button" class="btn btn-primary w-100 btn-lg" @click="moveToDoctorsQueue(apdModalData)" v-if="apdModalData.app_status == 0">
+                  <ion-icon :icon="checkmarkOutline" slot="start" class="me-2"></ion-icon>
+                  Initial Check-up Done
                 </button>
               </form>
               <br/><br/>
@@ -201,7 +245,8 @@ IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonModal,
 IonItem, IonItemDivider, IonLabel } from '@ionic/vue';
 import { chevronDownCircleOutline, pin, calendarOutline,
 timeOutline, arrowForwardOutline, callOutline, addOutline,
-chevronBackOutline, chevronForwardOutline, personCircleOutline, checkmarkOutline} from 'ionicons/icons';
+chevronBackOutline, chevronForwardOutline, personCircleOutline, checkmarkOutline,
+informationCircleOutline, accessibilityOutline, barbellOutline, speedometerOutline} from 'ionicons/icons';
 import store from '../store'
 import moment from 'moment'
 import { mapState } from 'vuex'
@@ -209,6 +254,7 @@ import AppConstants from '../constants/app.constants'
 import axios from "axios"
 import SettingsConstants from '../constants/settings.constants'
 import Swal from 'sweetalert2';
+import $ from 'jquery'
 
 export default  defineComponent({
   name: 'ScheduleAppointment',
@@ -219,7 +265,7 @@ export default  defineComponent({
     return {
       today: null,
       isAppointmentModalOpen: false,
-      selectedDate: null,
+      selectedDate: moment().format(),
       appointmentSlots: [],
       allAppointments: [],
       isAddDiagnosisPrescription: false,
@@ -230,6 +276,9 @@ export default  defineComponent({
       appDateandTime: [],
       isLoadingItems: true,
       welcomMessage: null,
+      patientHeight: null,
+      patientWeight: null,
+      patientBP: null,
     }
   },
   setup() {
@@ -243,7 +292,8 @@ export default  defineComponent({
       chevronDownCircleOutline, doRefresh, pin,
       calendarOutline, timeOutline, arrowForwardOutline,
       callOutline, addOutline, chevronBackOutline,
-      chevronForwardOutline, personCircleOutline, checkmarkOutline
+      chevronForwardOutline, personCircleOutline, checkmarkOutline,
+      informationCircleOutline, accessibilityOutline, barbellOutline, speedometerOutline
     }
   },
   computed: mapState([
@@ -264,14 +314,13 @@ export default  defineComponent({
       }
     },
     resetFields: function () {
-      this.appConcern = null;
+      //this.appConcern = null;
       this.appDiagnosis = null;
       this.appPrescription = null;
     },
     concernAddressed: function (details) {
       event.preventDefault();
       var bodyFormData = new FormData();
-      bodyFormData.append('app_concern', this.appConcern);
       bodyFormData.append('app_diagnosis', this.appDiagnosis);
       bodyFormData.append('app_prescription', this.appPrescription);
       axios({
@@ -303,12 +352,61 @@ export default  defineComponent({
               console.log(response);
           });
     },
+    moveToDoctorsQueue: function (details) {
+      event.preventDefault();
+      var bodyFormData = new FormData();
+      bodyFormData.append('app_patient_height', this.patientHeight);
+      bodyFormData.append('app_patient_weight', this.patientWeight);
+      bodyFormData.append('app_patient_bp', this.patientBP);
+      axios({
+          method: "post",
+          url: SettingsConstants.BASE_URL + "appointment.rest.php?type=addinitialcheckup&appointmentId="+ details.id,
+          data: bodyFormData,
+          headers: { "Content-Type": "multipart/form-data" },
+      })
+          .then(function (response) {
+            if (response.data == 1) {
+                Swal.fire(
+                  'Great!',
+                  'Appointment has been approved and moved to doctor\'s queue!',
+                  'success'
+                ).then(function (){
+                  this.dismiss();
+                  this.resetFields();
+                  this.getAllAppointments();
+                }.bind(this));
+            } else {
+                Swal.fire(
+                  'Error!',
+                  'Something went wrong when updating appointment!',
+                  'error'
+                );
+            }
+          }.bind(this))
+          .catch(function (response) {
+              console.log(response);
+          });
+    },
     getAllAppointments: function() {
       this.isLoadingItems = true;
       var today = moment().format().split('T')[0];
       this.allAppointments = [];
       var url = null;
-      (this.sessionData.user_level > 0) ? url = 'appointment.rest.php?type=all' : url = 'appointment.rest.php?type=allbyId&userId=' + this.sessionData.id;
+      if (this.sessionData.user_level > 0) {
+        switch (this.sessionData.user_level.toString()) {
+          case '1':
+            url = 'appointment.rest.php?type=nursesqueue';
+            break;
+          case '2':
+            url = 'appointment.rest.php?type=doctorsqueue';
+            break;
+          case '3':
+            url = 'appointment.rest.php?type=all';
+            break;
+        }
+      } else {
+        url = 'appointment.rest.php?type=allbyId&userId=' + this.sessionData.id;
+      }
       if (this.isAppointmentListToday) {
         url = url + '&isToday=' + today;
       }
@@ -321,7 +419,7 @@ export default  defineComponent({
                   app.agendaTitle = null;
                   app.timeSlot = null;
                   app.fullName = null;
-                  (this.sessionData.user_level == 2) ? app.disabledPrescription = false: app.disabledPrescription = true;
+                  (this.sessionData.user_level == "0" || this.sessionData.user_level == "3") ? app.disabledPrescription = true: app.disabledPrescription = false;
                   axios.get(SettingsConstants.BASE_URL + 'users.rest.php?type=nameonly&userId=' + app.app_userId, { crossdomain: true })
                   .then(function (response) {
                     if (response.data) {
@@ -375,6 +473,7 @@ export default  defineComponent({
     },
     toggleAppointmentModal: function () {
       this.isAppointmentModalOpen = !this.isAppointmentModalOpen;
+      $('ion-modal').removeAttr('tabindex');
     },
     checkForEnabledSlots: function () {
       this.getAppDateandTimeSlot();

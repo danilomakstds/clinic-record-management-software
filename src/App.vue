@@ -5,7 +5,7 @@
 
   <!-- Bootstrap Modal Vie item-->
   <!-- Modal -->
-  <div class="modal fade" id="drugViewModal" tabindex="-1" aria-labelledby="drugViewModalLabel" aria-hidden="true" v-if="drugViewDetails">
+  <div class="modal fade" id="drugViewModal" aria-labelledby="drugViewModalLabel" aria-hidden="true" v-if="drugViewDetails">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <div class="modal fade" id="patientViewModal" tabindex="-1" aria-labelledby="patientViewModalLabel" aria-hidden="true" v-if="patientViewDetails">
+  <div class="modal fade" id="patientViewModal" aria-labelledby="patientViewModalLabel" aria-hidden="true" v-if="patientViewDetails">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -103,7 +103,7 @@
     </div>
   </div>
 
-  <div class="modal fade" id="createAppointmentModal" tabindex="-1" aria-labelledby="createAppointmentModalLabel" aria-hidden="true" v-if="appointmentViewDetails">
+  <div class="modal fade" id="createAppointmentModal" aria-labelledby="createAppointmentModalLabel" aria-hidden="true" v-if="appointmentViewDetails">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -136,8 +136,15 @@
                   </select>
                 </ion-label>
               </ion-item>
+              <ion-item>
+                <ion-label>
+                  <h5 class="mb-2"><strong>Symptopms / Concerns</strong></h5>
+                  <textarea class="form-control" v-model="patientSymptoms" rows="3"></textarea>
+                </ion-label>
+              </ion-item>
             </ion-list>
             <br/>
+            
             <button type="submit" class="btn btn-primary btn-lg w-100">
               Create Appointment
             </button>
@@ -169,7 +176,8 @@ export default defineComponent({
   ]),
   data() {
     return {
-      selectedAgenda: null
+      selectedAgenda: null,
+      patientSymptoms: null,
     }
   },
   components: {
@@ -194,6 +202,7 @@ export default defineComponent({
       bodyFormData.append('app_apptype', this.selectedAgenda);
       bodyFormData.append('app_timeslot', details.SLOTID);
       bodyFormData.append('app_date', details.selectedDate);
+      bodyFormData.append('app_patientconcerns', this.patientSymptoms);
       axios({
           method: "post",
           url: SettingsConstants.BASE_URL + "appointment.rest.php?type=addappointment",
@@ -212,7 +221,7 @@ export default defineComponent({
             } else {
                 Swal.fire(
                   'Error!',
-                  'Something went wrong when creating your account!',
+                  'Something went wrong when creating your appointment!',
                   'error'
                 );
             }

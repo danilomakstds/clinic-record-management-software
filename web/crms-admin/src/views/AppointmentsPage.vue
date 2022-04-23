@@ -31,12 +31,13 @@
                     <td>{{app.convertedDate}}</td>
                     <td>{{app.timeSlot}}</td>
                     <td>
-                      <span class="badge rounded-pill bg-success" v-if="app.app_status == 1">Done</span>
-                      <span class="badge rounded-pill bg-secondary" v-else>Queued</span>
+                      <span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span>
+                      <span class="badge rounded-pill bg-primary" v-if="app.app_status == 1">Doctor's Queue</span>
+                      <span class="badge rounded-pill bg-secondary" v-if="app.app_status == 0">Created</span>
                     </td>
                     <td>
-                      <button @click="editAppointment(app)" data-bs-toggle="modal" data-bs-target="#editAppointment" type="button" class="btn btn-primary btn-sm me-2" title="Edit appointment" :disabled="app.app_status == 1"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                      <button @click="viewAppointment(app)" :disabled="app.app_status != 1" data-bs-toggle="modal" data-bs-target="#viewMore" type="button" class="btn btn-info btn-sm me-2 text-white" title="View more details"><font-awesome-icon :icon="['fa', 'eye']" /></button>
+                      <button @click="editAppointment(app)" :disabled="app.app_status > 0" data-bs-toggle="modal" data-bs-target="#editAppointment" type="button" class="btn btn-primary btn-sm me-2" title="Edit appointment"><font-awesome-icon :icon="['fa', 'pen']" /></button>
+                      <button @click="viewAppointment(app)" :disabled="app.app_status == 0" data-bs-toggle="modal" data-bs-target="#viewMore" type="button" class="btn btn-info btn-sm me-2 text-white" title="View more details"><font-awesome-icon :icon="['fa', 'eye']" /></button>
                       <button @click="removeAppointment(app)" type="button" class="btn btn-danger btn-sm me-2" title="Remove appointment"><font-awesome-icon :icon="['fa', 'trash-can']" /></button>
                     </td>
                   </tr>

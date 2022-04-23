@@ -35,35 +35,50 @@ switch ($_GET['type']) {
       }
       break;
    case 'allemails':
-         $sqlString = "SELECT user_email FROM `users`";
-         $rs = mysqli_query($con, $sqlString);
-         
-         if(mysqli_num_rows($rs) > 0){
-            while($objRs = mysqli_fetch_array($rs)){
-               $output[] = $objRs;
-            }
-            
-            $json = json_encode($output);
-            print($json);
-         } else {
-            print(0);
+      $sqlString = "SELECT user_email FROM `users`";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
          }
-         break;
+         
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
    case 'getallpatients':
-         $sqlString = "SELECT * FROM `users` WHERE user_level = 0";
-         $rs = mysqli_query($con, $sqlString);
-         
-         if(mysqli_num_rows($rs) > 0){
-            while($objRs = mysqli_fetch_array($rs)){
-               $output[] = $objRs;
-            }
-            
-            $json = json_encode($output);
-            print($json);
-         } else {
-            print(0);
+      $sqlString = "SELECT * FROM `users` WHERE user_level = 0";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
          }
-         break;
+         
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
+   case 'getalladmins':
+      $sqlString = "SELECT * FROM `users` WHERE user_level != 0";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
    case 'login':
       $user_email = $_POST['user_email'];
       $user_password = $_POST['user_password'];
@@ -109,48 +124,27 @@ switch ($_GET['type']) {
       $user_contactnum = $_POST['user_contactnum'];
       $user_dob = $_POST['user_dob'];
       $user_maritalstatus = $_POST['user_maritalstatus'];
-      
-      if (empty($_POST['user_suffix'])) {
-         $sqlString = "INSERT INTO `users` (`id`, `user_email`, `user_password`, `user_level`, `user_firstname`, `user_lastname`, `user_middlename`, `user_suffix`, `user_sex`, `user_address`, `user_city`, `user_province`, `user_contactnum`, `user_dob`, `user_maritalstatus`, `date_created`)
-            VALUES (NULL,
-            '{$user_email}',
-            '{$user_password}',
-            '0',
-            '{$user_firstname}',
-            '{$user_lastname}',
-            '{$user_middlename}',
-            '',
-            '{$user_sex}',
-            '{$user_address}',
-            '{$user_city}',
-            '{$user_province}',
-            '{$user_contactnum}',
-            '{$user_dob}',
-            '{$user_maritalstatus}', CURRENT_TIMESTAMP)";
-            $rs = mysqli_query($con, $sqlString);
-            echo(mysqli_affected_rows($con));
-      } else {
-         $user_suffix = $_POST['user_suffix'];
-         $sqlString = "INSERT INTO `users` (`id`, `user_email`, `user_password`, `user_level`, `user_firstname`, `user_lastname`, `user_middlename`, `user_suffix`, `user_sex`, `user_address`, `user_city`, `user_province`, `user_contactnum`, `user_dob`, `user_maritalstatus`, `date_created`)
-            VALUES (NULL,
-            '{$user_email}',
-            '{$user_password}',
-            '0',
-            '{$user_firstname}',
-            '{$user_lastname}',
-            '{$user_middlename}',
-            '{$user_suffix}',
-            '{$user_sex}',
-            '{$user_address}',
-            '{$user_city}',
-            '{$user_province}',
-            '{$user_contactnum}',
-            '{$user_dob}',
-            '{$user_maritalstatus}', CURRENT_TIMESTAMP)";
-            $rs = mysqli_query($con, $sqlString);
-            echo(mysqli_affected_rows($con));
-      }
-      
+      $user_level = $_POST['user_level'];
+      $user_suffix = $_POST['user_suffix'];
+      $sqlString = "INSERT INTO `users` (`id`, `user_email`, `user_password`, `user_level`, `user_firstname`, `user_lastname`, `user_middlename`, `user_suffix`, `user_sex`, `user_address`, `user_city`, `user_province`, `user_contactnum`, `user_dob`, `user_maritalstatus`, `date_created`)
+         VALUES (NULL,
+         '{$user_email}',
+         '{$user_password}',
+         '{$user_level}',
+         '{$user_firstname}',
+         '{$user_lastname}',
+         '{$user_middlename}',
+         '{$user_suffix}',
+         '{$user_sex}',
+         '{$user_address}',
+         '{$user_city}',
+         '{$user_province}',
+         '{$user_contactnum}',
+         '{$user_dob}',
+         '{$user_maritalstatus}', CURRENT_TIMESTAMP)";
+         $rs = mysqli_query($con, $sqlString);
+         echo(mysqli_affected_rows($con));
+     
       break;
    case 'updatepatient':
       $user_email = $_POST['user_email'];

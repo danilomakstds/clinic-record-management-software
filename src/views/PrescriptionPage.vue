@@ -23,7 +23,8 @@
 
         <ion-card-content>
           <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>{{app.timeSlot}}<br/>
-          <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>{{app.convertedDate}}
+          <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>{{app.convertedDate}}<br/>
+          <span class="badge rounded-pill bg-success mt-4" style="font-size: 13px">Done</span>
         </ion-card-content>
       </ion-card>
 
@@ -60,6 +61,18 @@
                   <ion-label>{{appConcern}}</ion-label>
                 </ion-item>
                 <ion-item>
+                    <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-secondary">Height</span> {{appHeight}} cm</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-secondary">Weight</span> {{appWeight}} kg</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-secondary">Blood Pressure</span> {{appBP}}</ion-label>
+                  </ion-item>
+                <ion-item>
                   <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
                   <ion-label><span class="badge bg-danger">Diagnosis</span> {{appDiagnosis}}</ion-label>
                 </ion-item>
@@ -88,7 +101,8 @@ IonItem, IonLabel, modalController, IonModal} from '@ionic/vue';
 import { chevronDownCircleOutline, pin, calendarOutline,
 timeOutline, arrowForwardOutline, callOutline, addOutline,
 chevronBackOutline, chevronForwardOutline, personCircleOutline,
-informationCircleOutline, bandageOutline, printOutline} from 'ionicons/icons';
+informationCircleOutline, bandageOutline, printOutline,
+accessibilityOutline, barbellOutline, speedometerOutline} from 'ionicons/icons';
 //import store from '../store'
 import moment from 'moment'
 import { mapState } from 'vuex'
@@ -114,7 +128,10 @@ export default  defineComponent({
       appPrescription: null,
       appDiagnosis: null,
       appConcern: null,
-      appFullname: null
+      appFullname: null,
+      appHeight: null,
+      appWeight: null,
+      appBP: null
     }
   },
   setup() {
@@ -129,7 +146,7 @@ export default  defineComponent({
       calendarOutline, timeOutline, arrowForwardOutline,
       callOutline, addOutline, chevronBackOutline,
       chevronForwardOutline, personCircleOutline, informationCircleOutline,
-      bandageOutline, printOutline
+      bandageOutline, printOutline, accessibilityOutline, barbellOutline, speedometerOutline
     }
   },
   computed: mapState([
@@ -159,6 +176,9 @@ export default  defineComponent({
         this.appDiagnosis = app.app_diagnosis;
         this.appConcern = app.app_patientconcerns;
         this.appFullname = app.fullName;
+        this.appHeight = app.app_patient_height;
+        this.appWeight = app.app_patient_weight;
+        this.appBP = app.app_patient_bp;
       } else {
         this.appAgenda = null;
         this.appTimeSlot = null;
@@ -167,6 +187,9 @@ export default  defineComponent({
         this.appDiagnosis = null;
         this.appConcern = null;
         this.appFullname = null;
+        this.appHeight = null;
+        this.appWeight = null;
+        this.appBP = null;
       }
     },
     getAllAppointments: function() {

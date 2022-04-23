@@ -49,6 +49,12 @@
                 <ion-label>Today's Appointments</ion-label>
             </ion-item>
         </ion-list>
+        <ion-list v-if="sessionData.user_level == 2">
+            <ion-item>
+                <ion-toggle color="primary" slot="start" @ionChange="onChangeAvailabilityToggle()" v-model="isDoctorIn"></ion-toggle>
+                <ion-label>The doctor is IN</ion-label>
+            </ion-item>
+        </ion-list>
     </ion-content>
 </ion-menu>
 </template>
@@ -95,7 +101,8 @@ export default defineComponent({
     name: 'TabsPage',
     data() {
         return {
-            isToday: false
+            isToday: false,
+            isDoctorIn: true
         }
     },
     computed: mapState([

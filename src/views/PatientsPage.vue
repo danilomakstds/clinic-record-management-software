@@ -370,6 +370,7 @@ export default defineComponent({
       bodyFormData.append('user_contactnum', this.userContact);
       bodyFormData.append('user_dob', this.userDateofbirth);
       bodyFormData.append('user_maritalstatus', this.userMaritalstatus);
+      bodyFormData.append('user_level', '0');
 
       axios({
           method: "post",
