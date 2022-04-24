@@ -1,4 +1,6 @@
 import { createApp } from 'vue'
+import Donut from 'vue-css-donut-chart';
+import 'vue-css-donut-chart/dist/vcdonut.css';
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -22,4 +24,4 @@ library.add(faPhone, faCartShopping, faCheck, faCartArrowDown, faBars,
     faCakeCandles, faHourglassEnd, faUserPen, faPen, faBan, faTrashCan, faComment,
     faEye, faPrint, faCapsules);
 
-createApp(App).use(store).use(router).component("font-awesome-icon", FontAwesomeIcon).mount('#app')
+createApp(App).use(store).use(router).use(Donut).component("font-awesome-icon", FontAwesomeIcon).mount('#app')

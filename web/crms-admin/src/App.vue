@@ -25,4 +25,8 @@
   .bg-pink {
     background-color: #D63384;
   }
+
+  .cdc-legend {
+    font-size: 14px;
+  }
 </style>

@@ -98,6 +98,10 @@
             </div>
           </ion-datetime>
 
+          <div class="alert alert-info" role="alert" style="border-radius:0px">
+            <ion-icon :icon="informationCircleOutline" class="me-3 float-start" size="large"></ion-icon>
+            Doctor's Schedule is <strong>Mondays</strong>, <strong>Tuesdays</strong>, and <strong>Wednesdays</strong> only.
+          </div>
            <!-- Item Dividers in a List -->
           <ion-list>
             <ion-item-divider>
@@ -490,7 +494,7 @@ export default  defineComponent({
         } else {
           startTime = moment().format().split("T")[0]+'T'+slot.TIMESTART+'+'+moment().format().split("+")[1];
         }
-        getNowTime > new Date(startTime).getTime() || (moment(startTime).format('dddd') == 'Saturday' || moment(startTime).format('dddd') == 'Sunday') ? slot.disabled = true : slot.disabled = false;
+        getNowTime > new Date(startTime).getTime() || (moment(startTime).format('dddd') == 'Saturday' || moment(startTime).format('dddd') == 'Sunday' || moment(startTime).format('dddd') == 'Thursday' || moment(startTime).format('dddd') == 'Friday') ? slot.disabled = true : slot.disabled = false;
       }.bind(this));
     },
     getAppDateandTimeSlot: function () {
