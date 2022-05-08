@@ -62,15 +62,15 @@
                 </ion-item>
                 <ion-item>
                     <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
-                    <ion-label><span class="badge bg-secondary">Height</span> {{appHeight}} cm</ion-label>
+                    <ion-label><span class="badge bg-light text-dark">Height</span> {{appHeight}} cm</ion-label>
                   </ion-item>
                   <ion-item>
                     <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
-                    <ion-label><span class="badge bg-secondary">Weight</span> {{appWeight}} kg</ion-label>
+                    <ion-label><span class="badge bg-light text-dark">Weight</span> {{appWeight}} kg</ion-label>
                   </ion-item>
                   <ion-item>
                     <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
-                    <ion-label><span class="badge bg-secondary">Blood Pressure</span> {{appBP}}</ion-label>
+                    <ion-label><span class="badge bg-light text-dark">Blood Pressure</span> {{appBP}}</ion-label>
                   </ion-item>
                 <ion-item>
                   <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
@@ -121,7 +121,6 @@ export default  defineComponent({
     return {
       allAppointments: [],
       isShowMoreDetailsOpen: false,
-
       appAgenda: null,
       appTimeSlot: null,
       appConvertedDate: null,
@@ -131,7 +130,8 @@ export default  defineComponent({
       appFullname: null,
       appHeight: null,
       appWeight: null,
-      appBP: null
+      appBP: null,
+      appointmentSlots: []
     }
   },
   setup() {
@@ -192,6 +192,15 @@ export default  defineComponent({
         this.appBP = null;
       }
     },
+    getAllSchedule: function () {
+       axios.get(SettingsConstants.BASE_URL + 'schedule.rest.php?type=all', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.appointmentSlots = response.data;
+              this.getAllAppointments();
+            }
+          }.bind(this));
+    },
     getAllAppointments: function() {
       this.allAppointments = [];
       var url = 'appointment.rest.php?type=alladdreesedbyId&userId=' + this.sessionData.id;
@@ -227,11 +236,11 @@ export default  defineComponent({
                         app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.TITLE
                         break;
                     }
-                    AppConstants.APPOINTMENT_SLOTS.forEach( function (slot){
-                      if (slot.SLOTID == app.app_timeslot) {
-                        app.timeSlot = slot.SCHED;
-                        app.timeStart = slot.TIMESTART;
-                        app.timeEnd = slot.TIMEEND;
+                    this.appointmentSlots.forEach( function (slot){
+                      if (slot.slotid == app.app_timeslot) {
+                        app.timeSlot = slot.sched;
+                        app.timeStart = slot.timestart;
+                        app.timeEnd = slot.timeend;
                       }
                     }.bind(app));
                     app.convertedDate = moment(app.app_date).format('LL');
@@ -241,7 +250,7 @@ export default  defineComponent({
     },
   },
   mounted() {
-    this.getAllAppointments();
+    this.getAllSchedule();
   },
 });
 </script>

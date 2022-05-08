@@ -138,12 +138,13 @@ export default {
           { label: 'Depo-Provera Injections', value: 0, color: '#DC3545', apptype: 7, appcount: 0 }
         ],
       totalAppointmentCount: 0,
+      drugDataRecords: [],
       chartData: {
-        labels: [ 'January', 'February', 'March' ],
+        labels: [],
         datasets: [
           {
-            data: [40, 20, 12],
-            backgroundColor: ['#09f','#f09','#198754']
+            data: [],
+            backgroundColor: ['#198754','#fd7e14','#d63384', '#0d6efd', '#6f42c1', '#0DCAF0', '#DC3545', '#FFF3CD', '#A3CFBB', '#A6E9D5', '#ccc', '#E9ECEF', '#CFF4FC', '#842029', '#801F4F']
           }
         ]
       },
@@ -210,11 +211,39 @@ export default {
               }
               
           }.bind(this));
+    },
+    getallDrugInventoryRecords: function () {
+      axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=getallrecords', { crossdomain: true })
+        .then(function (response) {
+            if (response.data) {
+              var dataset = [];
+              var nameset = [];
+              var counter = 0;
+              this.drugDataRecords = response.data;
+              this.drugDataRecords.forEach(function (record) {
+                 axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=getdrugbyid&drugid=' + record.drugid, { crossdomain: true })
+                 .then(function (response) {
+                   counter = counter + 1;
+                   if (response.data.length == 1) {
+                    record.drugname = response.data[0].drug_name + ' '+ response.data[0].drug_flavor;
+                    //console.log(record.drugname + ' - ' + record.sum_quantity);
+                    nameset.push(record.drugname);
+                    dataset.push(record.sum_quantity);
+                   }
+                   if (counter == this.drugDataRecords.length) {
+                     this.chartData.labels = nameset;
+                     this.chartData.datasets[0].data = dataset;
+                   }
+                 }.bind(this).bind(record).bind(dataset).bind(nameset));
+              }.bind(this));
+            }
+        }.bind(this));
     }
   },
   mounted() {
     this.getAllUsers();
     this.getAllAppointments();
+    this.getallDrugInventoryRecords();
   },
 }
 </script>

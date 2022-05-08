@@ -46,7 +46,7 @@ export default {
         text: "Please confirm logout action!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#0D6EFD',
+        confirmButtonColor: '#d33',
         cancelButtonColor: '#6C757D',
         confirmButtonText: 'Yes, logout!'
       }).then( function (result) {

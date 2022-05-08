@@ -19,6 +19,22 @@ switch ($_GET['type']) {
          print(0);
       }
       break;
+   case 'getdrugbyid':
+      $drugid = $_GET['drugid'];
+      $sqlString = "SELECT * FROM `drug` WHERE `drug`.`id` = '{$drugid}'";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
    case 'adddrug':
       $drug_name = $_POST['drug_name'];
       $drug_dose = $_POST['drug_dose'];
@@ -69,6 +85,28 @@ switch ($_GET['type']) {
       $sqlString = "DELETE FROM `drug` WHERE `drug`.`id` = '{$drugid}'";
       $rs = mysqli_query($con, $sqlString);
       echo(mysqli_affected_rows($con));
+      break;
+   case 'recordstock':
+      $drugid = $_GET['drugid'];
+      $quantity = $_GET['quantity'];
+      $sqlString = "INSERT INTO `drug_quantity_tracker` (`id`, `drugid`, `quantity`, `date_created`)
+      VALUES (NULL, '{$drugid}', '{$quantity}', current_timestamp())";
+      $rs = mysqli_query($con, $sqlString);
+      echo(mysqli_affected_rows($con));
+      break;
+   case 'getallrecords':
+      $sqlString = "SELECT id, drugid, sum(quantity) as sum_quantity FROM `drug_quantity_tracker` GROUP BY drugid";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
       break;
 }
 mysqli_close($con);

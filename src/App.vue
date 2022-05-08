@@ -119,7 +119,7 @@
               <ion-item>
                 <ion-label>
                   <h5><strong>Selected Timeslot</strong></h5>
-                  <img src="https://www.svgrepo.com/show/13698/time.svg" style="height:15px" class="me-2"/> {{appointmentViewDetails.SCHED}}
+                  <img src="https://www.svgrepo.com/show/13698/time.svg" style="height:15px" class="me-2"/> {{appointmentViewDetails.sched}}
                 </ion-label>
               </ion-item>
               <ion-item>
@@ -200,7 +200,7 @@ export default defineComponent({
       var bodyFormData = new FormData();
       bodyFormData.append('app_userId', this.sessionData.id);
       bodyFormData.append('app_apptype', this.selectedAgenda);
-      bodyFormData.append('app_timeslot', details.SLOTID);
+      bodyFormData.append('app_timeslot', details.slotid);
       bodyFormData.append('app_date', details.selectedDate);
       bodyFormData.append('app_patientconcerns', this.patientSymptoms);
       axios({

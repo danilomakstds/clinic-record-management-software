@@ -49,6 +49,21 @@ switch ($_GET['type']) {
          print(0);
       }
       break;
+   case 'allnumbers':
+      $sqlString = "SELECT user_contactnum FROM `users`";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
    case 'getallpatients':
       $sqlString = "SELECT * FROM `users` WHERE user_level = 0";
       $rs = mysqli_query($con, $sqlString);
@@ -82,7 +97,7 @@ switch ($_GET['type']) {
    case 'login':
       $user_email = $_POST['user_email'];
       $user_password = $_POST['user_password'];
-      $sqlString = "SELECT * FROM `users` WHERE user_password = '{$user_password}' AND user_email = '{$user_email}'";
+      $sqlString = "SELECT * FROM `users` WHERE user_password = '{$user_password}' AND user_email = '{$user_email}' OR user_password = '{$user_password}' AND user_contactnum = '{$user_email}'";
       $rs = mysqli_query($con, $sqlString);
       
       if(mysqli_num_rows($rs) > 0){
@@ -160,6 +175,7 @@ switch ($_GET['type']) {
       $user_maritalstatus = $_POST['user_maritalstatus'];
       $user_suffix = $_POST['user_suffix'];
       $userid = $_GET['userid'];
+      $user_password = $_POST['user_password'];
 
       $sqlString = "UPDATE `users` SET
       `user_email` = '{$user_email}',
@@ -173,6 +189,7 @@ switch ($_GET['type']) {
       `user_province` = '{$user_province}',
       `user_contactnum` = '{$user_contactnum}',
       `user_dob` = '{$user_dob}',
+      `user_password` = '{$user_password}',
       `user_maritalstatus` = '{$user_maritalstatus}' WHERE id = '{$userid}'";
       $rs = mysqli_query($con, $sqlString);
       echo(mysqli_affected_rows($con));

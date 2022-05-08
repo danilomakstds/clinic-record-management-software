@@ -39,6 +39,12 @@
             <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>{{app.timeSlot}}<br/>
             <span class="badge rounded-pill bg-secondary mt-4" style="font-size: 13px" v-if="app.app_status == 0">Created</span>
             <span class="badge rounded-pill bg-primary mt-4" style="font-size: 13px" v-if="app.app_status == 1">Doctor's Queue</span>
+            <span class="badge rounded-pill bg-success mt-4" style="font-size: 13px" v-if="app.app_status == 2">Done</span>
+            <span v-if="sessionData.user_level == 3">
+              <button type="button" class="btn btn-danger float-end" @click="removeAppointment(app)" ><ion-icon :icon="trashOutline"></ion-icon></button>
+              <button type="button" class="btn btn-info float-end me-2 text-white" :disabled="app.app_status == 0" @click="toggleShowMoreModal(app)"><ion-icon :icon="eyeOutline"></ion-icon></button>
+              <button type="button" class="btn btn-primary float-end me-2 text-white" :disabled="app.app_status != 0" @click="toggleEditAppointmentModal(app)"><ion-icon :icon="createOutline"></ion-icon></button>
+            </span>
           </ion-card-content>
         </ion-card>
 
@@ -100,7 +106,18 @@
 
           <div class="alert alert-info" role="alert" style="border-radius:0px">
             <ion-icon :icon="informationCircleOutline" class="me-3 float-start" size="large"></ion-icon>
-            Doctor's Schedule is <strong>Mondays</strong>, <strong>Tuesdays</strong>, and <strong>Wednesdays</strong> only.
+            Doctor's Schedule is
+            <span v-for="(work, index) in workdays" :key="`work-${index}`">
+              <span v-if="index == workdays.length - 1">and </span> 
+              <strong v-if="work == daysConstant.SUNDAY.VALUE">{{daysConstant.SUNDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+              <strong v-if="work == daysConstant.MONDAY.VALUE">{{daysConstant.MONDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+              <strong v-if="work == daysConstant.TUESDAY.VALUE">{{daysConstant.TUESDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+              <strong v-if="work == daysConstant.WEDNESDAY.VALUE">{{daysConstant.WEDNESDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+              <strong v-if="work == daysConstant.THURSDAY.VALUE">{{daysConstant.THURSDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+              <strong v-if="work == daysConstant.FRIDAY.VALUE">{{daysConstant.FRIDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+              <strong v-if="work == daysConstant.SATURDAY.VALUE">{{daysConstant.SATURDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
+            </span>
+            only.
           </div>
            <!-- Item Dividers in a List -->
           <ion-list>
@@ -109,14 +126,14 @@
                 Morning Schedule
               </ion-label>
             </ion-item-divider>
-            <div v-for="appointment in appointmentSlots" :key="appointment.SLOTID">
-              <ion-item class="ps-2" :id="'slot-'+appointment.SLOTID"
+            <div v-for="appointment in appointmentSlots" :key="appointment.slotid">
+              <ion-item class="ps-2" :id="'slot-'+appointment.slotid"
               data-bs-toggle="modal" data-bs-target="#createAppointmentModal" 
               @click="openAppointmentModal(appointment)" :disabled="appointment.disabled">
-                <ion-label>{{appointment.SCHED}}</ion-label>
+                <ion-label>{{appointment.sched}}</ion-label>
                 <ion-icon :icon="chevronForwardOutline" slot="end"/>
               </ion-item>
-              <ion-item-divider v-if="appointment.SLOTID == 8">
+              <ion-item-divider v-if="appointment.slotid == 8">
                 <ion-label>
                   Afternoon Schedule
                 </ion-label>
@@ -230,6 +247,104 @@
             </div>
           </ion-content>
         </ion-modal>
+
+        <ion-modal
+        :is-open="isShowMoreDetailsOpen"
+        :breakpoints="[0.1, 0.7, 0.85]"
+        :initialBreakpoint="0.7"
+        @didDismiss="toggleShowMoreModal()"
+        >
+        <ion-content>
+          <div class="p-4">
+             <ion-list>
+                <ion-item>
+                  <ion-icon :icon="personCircleOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{app2Fullname}}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{app2TimeSlot}}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{app2ConvertedDate}}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon :icon="informationCircleOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{app2Concern}}</ion-label>
+                </ion-item>
+                <ion-item>
+                    <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-light text-dark">Height</span> {{app2Height}} cm</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-light text-dark">Weight</span> {{app2Weight}} kg</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-light text-dark">Blood Pressure</span> {{app2BP}}</ion-label>
+                  </ion-item>
+                <ion-item>
+                  <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label><span class="badge bg-danger">Diagnosis</span> {{app2Diagnosis}}</ion-label>
+                </ion-item>
+                <ion-item @click="printPrescription(app)">
+                  <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{app2Prescription}}</ion-label>
+                  <ion-icon :icon="printOutline" slot="end"></ion-icon>
+                </ion-item>
+             </ion-list>
+          </div>
+        </ion-content>
+        </ion-modal>
+
+        <ion-modal
+        :is-open="isEditAppointmentModalOpen"
+        :breakpoints="[0.1, 0.7, 0.85]"
+        :initialBreakpoint="0.7"
+        @didDismiss="toggleEditAppointmentModal()"
+        >
+          <ion-content>
+            <div class="p-4">
+              <form @submit="saveAppointmentChanges()">
+              <ion-list>
+                  <ion-item>
+                    <ion-label>
+                      <label style="font-size:15px" class="fw-bold mb-2">Agenda</label><br/>
+                      <select class="form-select form-select-lg" v-model="editAgenda">
+                        <option value="1">Labor</option>
+                        <option value="2">Prenatal Care</option>
+                        <option value="3">Checkup / Consultation</option>
+                        <option value="4">COVID-19 Vaccination</option>
+                        <option value="5">Anti Rabies Vaccination Care</option>
+                        <option value="6">Anti Tetanus Vaccination</option>
+                        <option value="7">Depo-Provera Injections</option>
+                      </select>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>
+                      <label style="font-size:13px" class="fw-bold mb-2">Change Date</label><br/>
+                      <div class="mb-3">
+                        <input type="date" class="form-control form-control-lg" v-model="editDate"/>
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>
+                      <label style="font-size:13px" class="fw-bold mb-2">Chage Time Slot</label><br/>
+                      <select class="form-select form-select-lg" v-model="editTimeSlot">
+                        <option v-for="slot in appointmentSlots" :key="slot.id" :value="slot.slotid">{{slot.sched}}</option>
+                      </select>
+                    </ion-label>
+                  </ion-item>
+              </ion-list>
+              <button type="submit" class="btn btn-primary btn-lg w-100 mb-2 mt-3">Update Appointment</button>
+              </form>
+            </div>
+          </ion-content>
+        </ion-modal>
       </div>
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed" v-if="sessionData.user_level == 0">
@@ -250,7 +365,8 @@ IonItem, IonItemDivider, IonLabel } from '@ionic/vue';
 import { chevronDownCircleOutline, pin, calendarOutline,
 timeOutline, arrowForwardOutline, callOutline, addOutline,
 chevronBackOutline, chevronForwardOutline, personCircleOutline, checkmarkOutline,
-informationCircleOutline, accessibilityOutline, barbellOutline, speedometerOutline} from 'ionicons/icons';
+informationCircleOutline, accessibilityOutline, barbellOutline, speedometerOutline,
+trashOutline, eyeOutline, bandageOutline, createOutline} from 'ionicons/icons';
 import store from '../store'
 import moment from 'moment'
 import { mapState } from 'vuex'
@@ -283,6 +399,26 @@ export default  defineComponent({
       patientHeight: null,
       patientWeight: null,
       patientBP: null,
+
+      isShowMoreDetailsOpen: false,
+      app2Agenda: null,
+      app2TimeSlot: null,
+      app2ConvertedDate: null,
+      app2Prescription: null,
+      app2Diagnosis: null,
+      app2Concern: null,
+      app2Fullname: null,
+      app2Height: null,
+      app2Weight: null,
+      app2BP: null,
+
+      isEditAppointmentModalOpen: false,
+      editedAppointment: null,
+      editDate: null,
+      editTimeSlot: null,
+      editAppointmentSlots: null,
+      daysConstant: null,
+      workdays: [],
     }
   },
   setup() {
@@ -297,7 +433,8 @@ export default  defineComponent({
       calendarOutline, timeOutline, arrowForwardOutline,
       callOutline, addOutline, chevronBackOutline,
       chevronForwardOutline, personCircleOutline, checkmarkOutline,
-      informationCircleOutline, accessibilityOutline, barbellOutline, speedometerOutline
+      informationCircleOutline, accessibilityOutline, barbellOutline, speedometerOutline,
+      trashOutline, eyeOutline, bandageOutline, createOutline
     }
   },
   computed: mapState([
@@ -309,6 +446,68 @@ export default  defineComponent({
       modalController .dismiss({
         'dismissed': true
       });
+    },
+    saveAppointmentChanges: function () {
+      event.preventDefault();
+      var bodyFormData = new FormData();
+      bodyFormData.append('app_type', this.editAgenda);
+      bodyFormData.append('app_timeslot', this.editTimeSlot);
+      bodyFormData.append('app_date', moment(this.editDate).format());
+      axios({
+          method: "post",
+          url: SettingsConstants.BASE_URL + "appointment.rest.php?type=updateappointment&app_id=" + this.editedAppointment.id,
+          data: bodyFormData,
+          headers: { "Content-Type": "multipart/form-data" },
+      })
+          .then(function (response) {
+            if (response.data == 1) {
+                Swal.fire(
+                  'Success!',
+                  'Appointment has been updated!',
+                  'success'
+                );
+                setTimeout(function(){
+                  this.dismiss();
+                  this.resetFields();
+                  this.getAllAppointments();
+                }.bind(this), 500); 
+            } else {
+                Swal.fire(
+                  'Error!',
+                  'Something went wrong when updating appointment item!',
+                  'error'
+                );
+            }
+          }.bind(this))
+          .catch(function (response) {
+              console.log(response);
+          });
+    },
+    toggleShowMoreModal: function (app) {
+      this.isShowMoreDetailsOpen = !this.isShowMoreDetailsOpen;
+      if (app) {
+        this.app2Agenda = app.agendaTitle;
+        this.app2TimeSlot = app.timeSlot;
+        this.app2ConvertedDate = app.convertedDate;
+        this.app2Prescription = app.app_prescription;
+        this.app2Diagnosis = app.app_diagnosis;
+        this.app2Concern = app.app_patientconcerns;
+        this.app2Fullname = app.fullName;
+        this.app2Height = app.app_patient_height;
+        this.app2Weight = app.app_patient_weight;
+        this.app2BP = app.app_patient_bp;
+      } else {
+        this.app2Agenda = null;
+        this.app2TimeSlot = null;
+        this.app2ConvertedDate = null;
+        this.app2Prescription = null;
+        this.app2Diagnosis = null;
+        this.app2Concern = null;
+        this.app2Fullname = null;
+        this.app2Height = null;
+        this.app2Weight = null;
+        this.app2BP = null;
+      }
     },
     toggleAddDiagnosisModal: function (appData) {
       console.log(appData);
@@ -391,6 +590,26 @@ export default  defineComponent({
               console.log(response);
           });
     },
+    getAllSchedule: function () {
+       axios.get(SettingsConstants.BASE_URL + 'schedule.rest.php?type=all', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.appointmentSlots = response.data;
+              this.getAllAppointments();
+              if (this.sessionData.user_level == 0) {
+                this.checkForEnabledSlots();
+              }
+            }
+          }.bind(this));
+    },
+    getAllWorkDays: function () {
+       axios.get(SettingsConstants.BASE_URL + 'schedule.rest.php?type=workdays', { crossdomain: true })
+          .then(function (response) {
+            if (response.data[0].daysarray) {
+              this.workdays = response.data[0].daysarray.split(",");
+            }
+          }.bind(this));
+    },
     getAllAppointments: function() {
       this.isLoadingItems = true;
       var today = moment().format().split('T')[0];
@@ -405,7 +624,7 @@ export default  defineComponent({
             url = 'appointment.rest.php?type=doctorsqueue';
             break;
           case '3':
-            url = 'appointment.rest.php?type=all';
+            url = 'appointment.rest.php?type=everything';
             break;
         }
       } else {
@@ -454,11 +673,11 @@ export default  defineComponent({
                       app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.TITLE
                       break;
                   }
-                  AppConstants.APPOINTMENT_SLOTS.forEach( function (slot){
-                    if (slot.SLOTID == app.app_timeslot) {
-                      app.timeSlot = slot.SCHED;
-                      app.timeStart = slot.TIMESTART;
-                      app.timeEnd = slot.TIMEEND;
+                  this.appointmentSlots.forEach( function (slot){
+                    if (slot.slotid == app.app_timeslot) {
+                      app.timeSlot = slot.sched;
+                      app.timeStart = slot.timestart;
+                      app.timeEnd = slot.timeend;
                     }
                   }.bind(app));
                   app.convertedDate = moment(app.app_date).format('LL');
@@ -480,8 +699,31 @@ export default  defineComponent({
       $('ion-modal').removeAttr('tabindex');
     },
     checkForEnabledSlots: function () {
+      var workdaysArray = [];
+      this.workdays.forEach(function (day) {
+          if (day.toString() == this.daysConstant.SUNDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.SUNDAY.TITLE)
+          }
+          if (day.toString() == this.daysConstant.MONDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.MONDAY.TITLE)
+          }
+          if (day.toString() == this.daysConstant.TUESDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.TUESDAY.TITLE)
+          }
+          if (day.toString() == this.daysConstant.WEDNESDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.WEDNESDAY.TITLE)
+          }
+          if (day.toString() == this.daysConstant.THURSDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.THURSDAY.TITLE)
+          }
+          if (day.toString() == this.daysConstant.FRIDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.FRIDAY.TITLE)
+          }
+          if (day.toString() == this.daysConstant.SATURDAY.VALUE.toString()) {
+            workdaysArray.push(this.daysConstant.SATURDAY.TITLE)
+          }
+      }.bind(this));
       this.getAppDateandTimeSlot();
-      this.appointmentSlots = AppConstants.APPOINTMENT_SLOTS;
       var getNowTime = new Date();
       var allowance = 2;
       getNowTime = getNowTime.setHours(getNowTime.getHours() + allowance);
@@ -490,11 +732,13 @@ export default  defineComponent({
         if (this.selectedDate) {
           slot.selectedDate = this.selectedDate;
           slot.title = moment(this.selectedDate).format('dddd') +', '+ moment(this.selectedDate).format('LL');
-          startTime = moment(this.selectedDate).format().split("T")[0]+'T'+slot.TIMESTART+'+'+moment(this.selectedDate).format().split("+")[1];
+          startTime = moment(this.selectedDate).format().split("T")[0]+'T'+slot.timestart+'+'+moment(this.selectedDate).format().split("+")[1];
         } else {
-          startTime = moment().format().split("T")[0]+'T'+slot.TIMESTART+'+'+moment().format().split("+")[1];
+          startTime = moment().format().split("T")[0]+'T'+slot.timestart+'+'+moment().format().split("+")[1];
         }
-        getNowTime > new Date(startTime).getTime() || (moment(startTime).format('dddd') == 'Saturday' || moment(startTime).format('dddd') == 'Sunday' || moment(startTime).format('dddd') == 'Thursday' || moment(startTime).format('dddd') == 'Friday') ? slot.disabled = true : slot.disabled = false;
+        
+        getNowTime > new Date(startTime).getTime() ||
+        (!workdaysArray.includes(moment(startTime).format('dddd'))) ? slot.disabled = true : slot.disabled = false;
       }.bind(this));
     },
     getAppDateandTimeSlot: function () {
@@ -514,7 +758,7 @@ export default  defineComponent({
                     startTime = moment().format().split("T")[0];
                   }
                   this.appDateandTime.filter( function (datetime){
-                    if (datetime.app_timeslot == slot.SLOTID.toString() && startTime == datetime.dateonly){
+                    if (datetime.app_timeslot == slot.slotid.toString() && startTime == datetime.dateonly){
                       if(!slot.disabled) {
                         slot.disabled = true;
                       }
@@ -523,15 +767,55 @@ export default  defineComponent({
                 }.bind(this));
             }
         }.bind(this));
+    },
+    removeAppointment: function (app) {
+      Swal.fire({
+        title: 'Remove Appointment?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6C757D',
+        confirmButtonText: 'Yes, remove it!'
+      }).then( function (result) {
+        if (result.isConfirmed) {
+          axios.get(SettingsConstants.BASE_URL + 'appointment.rest.php?type=deleteappointment&appid=' + app.id, { crossdomain: true })
+            .then(function (response) {
+              if (response.data) {
+                Swal.fire(
+                  'Removed!',
+                  'Appointment has been removed.',
+                  'success'
+                ).then(function (){
+                  this.getAllAppointments();
+                }.bind(this));
+              }
+            }.bind(this));
+        }
+      }.bind(this))
+    },
+    toggleEditAppointmentModal: function (app) {
+      this.isEditAppointmentModalOpen = !this.isEditAppointmentModalOpen;
+      if (app) {
+        this.editedAppointment = app;
+        this.editAgenda = this.editedAppointment.app_apptype;
+        this.editDate = this.editedAppointment.app_date.split('T')[0];
+        this.editTimeSlot = this.editedAppointment.app_timeslot;
+      } else {
+        this.editedAppointment = null;
+        this.editAgenda = null;
+        this.editDate = null;
+        this.editTimeSlot = null;
+      }
     }
   },
   mounted() {
-    this.appointmentSlots = AppConstants.APPOINTMENT_SLOTS;
-    moment().format('LT').includes("AM") ? this.welcomMessage = 'morning' : this.welcomMessage = 'afternoon';
+    this.getAllSchedule();
+    this.daysConstant = AppConstants.DAYS;
     if (this.sessionData.user_level == 0) {
-      this.checkForEnabledSlots();
+      this.getAllWorkDays();
     }
-    this.getAllAppointments();
+    moment().format('LT').includes("AM") ? this.welcomMessage = 'morning' : this.welcomMessage = 'afternoon';
     this.emitter.on('isTodayChanged', function () {
       this.getAllAppointments();
     }.bind(this));

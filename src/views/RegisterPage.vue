@@ -25,7 +25,7 @@
             <td colspan="2" style="padding: 5px">
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control form-control-lg" id="email" required v-model="userEmail">
+                <input type="email" class="form-control form-control-lg" id="email" v-model="userEmail" required>
               </div>
             </td>
           </tr>
@@ -50,7 +50,7 @@
               </div>
             </td>
           </tr>
-          <tr v-if="userPassword !== userConfirmPassword">
+          <tr v-if="(userPassword !== userConfirmPassword) && userPassword != ''">
             <td colspan="2">
               <div class="alert alert-danger" role="alert">
                 Passwords did not match!
@@ -140,6 +140,13 @@
               </div>
             </td>
           </tr>
+          <tr v-if="!isContactNumValid">
+            <td colspan="2">
+              <div class="alert alert-danger" role="alert">
+                This contact number was already registered or invalid. Please use another one.
+              </div>
+            </td>
+          </tr>
           <tr>
             <td colspan="2" style="padding: 5px">
               <div class="mb-3">
@@ -169,7 +176,7 @@
           </tr>
         </table>
 
-        <button type="submit" class="btn btn-primary btn-lg w-100 mt-2" :disabled="!isEmailValid || !(userPassword == userConfirmPassword)">Register</button>
+        <button type="submit" class="btn btn-primary btn-lg w-100 mt-2" :disabled="!isEmailValid || !isContactNumValid || (!(userPassword == userConfirmPassword) && userPassword != '')">Register</button>
         </form>
         
       </div>
@@ -194,6 +201,18 @@ export default  defineComponent({
         var counter = [];
         counter = this.allEmails.filter(email => email.user_email.toLowerCase() == newVal.toLowerCase());
         !counter.length ? this.isEmailValid = true : this.isEmailValid = false ;
+      } else {
+        this.isEmailValid = false;
+      }
+    },
+    userContact: function (newVal) {
+      if (newVal) {
+        this.allNumbers = this.allNumbersTemp;
+        var counter = [];
+        counter = this.allNumbers.filter(num => num.user_contactnum == newVal);
+        !counter.length ? this.isContactNumValid = true : this.isContactNumValid = false ;
+      } else {
+        this.isContactNumValid = false;
       }
     }
   },
@@ -224,7 +243,10 @@ export default  defineComponent({
       userMaritalstatus: 1,
       allEmails: [],
       allEmailsTemp: [],
-      isEmailValid: true
+      allNumbers: [],
+      allNumbersTemp: [],
+      isEmailValid: true,
+      isContactNumValid: true
     }
   },
   components: { IonContent, IonPage, IonRefresher, IonRefresherContent },
@@ -232,7 +254,7 @@ export default  defineComponent({
     registerPatient: function () {
       event.preventDefault();
       var bodyFormData = new FormData();
-      bodyFormData.append('user_email', this.userEmail);
+      this.userEmail ? bodyFormData.append('user_email', this.userEmail) : bodyFormData.append('user_email', '');
       bodyFormData.append('user_password', this.userPassword);
       bodyFormData.append('user_firstname', this.userFirstname);
       bodyFormData.append('user_lastname', this.userLastname);
@@ -296,10 +318,21 @@ export default  defineComponent({
                   this.allEmailsTemp = this.allEmails;
               }
           }.bind(this));
+    },
+    getAllExistingContactNumbers: function () {
+      this.allNumbers = [];
+      axios.get(SettingsConstants.BASE_URL + 'users.rest.php?type=allnumbers', { crossdomain: true })
+          .then(function (response) {
+              if (response.data) {
+                  this.allNumbers = response.data;
+                  this.allNumbersTemp = this.allNumbers;
+              }
+          }.bind(this));
     }
   },
   mounted() {
     this.getAllExistingEmails();
+    this.getAllExistingContactNumbers();
   },
 });
 </script>

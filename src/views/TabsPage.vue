@@ -10,7 +10,8 @@
 
             <ion-tab-button tab="tab2" href="/tabs/patients" v-if="sessionData.user_level > 0">
                 <ion-icon :icon="personAddOutline" />
-                <ion-label>Patients</ion-label>
+                <ion-label v-if="sessionData.user_level < 3">Patients</ion-label>
+                <ion-label v-else>Users List</ion-label>
             </ion-tab-button>
 
             <ion-tab-button tab="tab3" href="/tabs/inventory" v-if="sessionData.user_level > 0">
@@ -49,10 +50,16 @@
                 <ion-label>Today's Appointments</ion-label>
             </ion-item>
         </ion-list>
-        <ion-list v-if="sessionData.user_level == 2">
+        <ion-list v-if="sessionData.user_level == 3">
             <ion-item>
-                <ion-toggle color="primary" slot="start" @ionChange="onChangeAvailabilityToggle()" v-model="isDoctorIn"></ion-toggle>
-                <ion-label>The doctor is IN</ion-label>
+                <ion-toggle color="primary" slot="start" @ionChange="onChangeShowAdmins()" v-model="isShowAdmin"></ion-toggle>
+                <ion-label>Show admins only</ion-label>
+            </ion-item>
+        </ion-list>
+        <ion-list v-if="sessionData.user_level == 3">
+            <ion-item>
+                <ion-toggle color="primary" slot="start" @ionChange="onChangeShowshowPatients()" v-model="isShowPatients"></ion-toggle>
+                <ion-label>Show patients only</ion-label>
             </ion-item>
         </ion-list>
     </ion-content>
@@ -79,7 +86,8 @@ import {
     IonToolbar,
     menuController,
     alertController,
-    IonToggle
+    IonToggle,
+    //IonItemDivider
 } from '@ionic/vue';
 
 import {
@@ -99,15 +107,30 @@ import store from '../store'
 
 export default defineComponent({
     name: 'TabsPage',
+    watch: {
+        isShowPatients: function (newVal) {
+            if (newVal) {
+                this.isShowAdmin = false;  
+            }
+        },
+        isShowAdmin: function (newVal) {
+            if (newVal) {
+                this.isShowPatients = false;
+            }
+        }
+    },
     data() {
         return {
             isToday: false,
-            isDoctorIn: true
+            isShowAdmin: false,
+            isShowPatients: false
         }
     },
     computed: mapState([
         'sessionData',
-        'isAppointmentListToday'
+        'isAppointmentListToday',
+        'showPatientsOnly',
+        'showAdminsOnly'
     ]),
     components: {
         IonLabel,
@@ -124,7 +147,8 @@ export default defineComponent({
         IonMenu,
         IonTitle,
         IonToolbar,
-        IonToggle
+        IonToggle,
+        //IonItemDivider
     },
     setup() {
         return {
@@ -143,6 +167,14 @@ export default defineComponent({
     methods: {
         openFirst() {
             menuController.open('first');
+        },
+        onChangeShowAdmins: function () {
+            store.commit('SET_SHOW_ADMINS_ONLY', this.isShowAdmin);
+            this.emitter.emit('isShowAdminChange');
+        },
+        onChangeShowshowPatients: function () {
+            store.commit('SET_SHOW_PATIENTS_ONLY', this.isShowPatients);
+            this.emitter.emit('isShowPatientChange');
         },
         onChangeToggle: function () {
             store.commit('SET_TODAY_APPOINTMENT_LIST', this.isToday);
@@ -184,6 +216,8 @@ export default defineComponent({
     },
     mounted() {
       this.isToday = this.isAppointmentListToday;
+      this.isShowAdmin = this.showAdminsOnly;
+      this.isShowPatients = this.showPatientsOnly;
     },
 });
 </script>

@@ -4,6 +4,7 @@ import MainPage from '../views/DashboardPage.vue'
 import AppointmentsPage from '../views/AppointmentsPage.vue'
 import PatientsPage from '../views/PatientsPage.vue'
 import DrugInventoryPage from '../views/DrugInventoryPage.vue'
+import ExamplePage from '../views/ExamplePage.vue'
 import store from '../store';
 
 const routes = [
@@ -11,6 +12,11 @@ const routes = [
     path: '/',
     name: 'LoginPage',
     component: LoginPage
+  },
+  {
+    path: '/example',
+    name: 'ExamplePage',
+    component: ExamplePage
   },
   {
     path: '/:pathMatch(.*)*',

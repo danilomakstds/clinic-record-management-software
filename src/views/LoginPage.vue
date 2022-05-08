@@ -17,12 +17,12 @@
         <div class="alert fade show mb-4 text-start" role="alert" :class="messageType" v-if="message" v-html="message"></div>
         <form class="text-start" @submit="checkIfUserExist">
           <div class="mb-3">
-            <ion-label class="text-dark">Email address</ion-label>
-            <input type="email" class="form-control form-control-lg" id="exampleFormControlInput1" v-model="userEmail">
+            <ion-label class="text-dark">Email address / Phone Number</ion-label>
+            <input type="text" class="form-control form-control-lg mt-2" id="exampleFormControlInput1" v-model="userEmail" required>
           </div>
           <div class="mb-3">
             <ion-label class="text-dark">Password</ion-label>
-            <input type="password" class="form-control form-control-lg" id="exampleFormControlInput1" v-model="userPassword">
+            <input type="password" class="form-control form-control-lg mt-2" id="exampleFormControlInput1" v-model="userPassword" required>
           </div>
           <button type="submit" class="btn btn-primary btn-lg w-100">Login</button>
         </form>
@@ -93,7 +93,7 @@ export default  defineComponent({
                 }
             } else {
                 this.showMessage = true;
-                this.message = "<strong>Error! </strong> No user found matching email and password!";
+                this.message = "<strong>Error! </strong> No user found matching email/contact number and password!";
                 this.messageType = "alert-danger";
             }
           }.bind(this))

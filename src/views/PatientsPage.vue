@@ -35,7 +35,11 @@
             <ion-avatar slot="start">
               <img src="../../resources/avatar.svg">
             </ion-avatar>
-            <ion-label>{{ user.fullName }}</ion-label>
+            <ion-label>{{ user.fullName }}
+              <span class="badge rounded-pill bg-primary ms-2" v-if="user.user_level == 3">Super Admin</span>
+              <span class="badge rounded-pill bg-info ms-2" v-if="user.user_level == 2">Doctor</span>
+              <span class="badge rounded-pill bg-warning ms-2" v-if="user.user_level == 1">Nurse</span>
+            </ion-label>
           </ion-item>
         </ion-item-sliding>
       </ion-list>
@@ -54,10 +58,24 @@
         </ion-header>
         <ion-content>
           <div class="p-4" >
-              <label class="form-label mb-0" style="font-size:12px"><span v-if="!isEdit">Add</span><span v-else>Edit</span> Patient Modal</label>
+              <label class="form-label mb-0" style="font-size:12px"><span v-if="!isEdit">Add</span><span v-else>Edit</span>
+              <span v-if="sessionData.user_level != 3">Patient</span> <span v-else> User</span> Modal</label>
               <hr class="mt-2 mb-2"/>
               <form @submit="registerPatient">
                 <table class="w-100">
+                  <tr class="w-100">
+                    <td colspan="2">
+                      <div class="mb-3 w-100">
+                        <label class="form-label">User Type</label>
+                        <select class="form-select w-100" required v-model="userLevel">
+                          <option :value="0">Patient</option>
+                          <option :value="1">Nurse</option>
+                          <option :value="2">Doctor</option>
+                          <option :value="3">Admin</option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
                   <tr>
                     <td style="padding: 5px">
                       <div class="mb-3">
@@ -86,15 +104,21 @@
                       </div>
                     </td>
                   </tr>
-                                    <tr>
-                    <td colspan="2" style="padding: 5px">
+                  <tr>
+                    <td :colspan="(userLevel > 0) ? 1 : 2" style="padding: 5px">
                       <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control form-control-lg" id="email" required v-model="userEmail">
                       </div>
                     </td>
+                    <td v-if="userLevel > 0">
+                      <div class="mb-3">
+                        <label class="form-label">User Password</label>
+                        <input type="password" class="form-control form-control-lg" v-model="userPassword" required>
+                      </div>
+                    </td>
                   </tr>
-                  <tr v-if="!isEmailValid && !isEdit && userEmail">
+                  <tr v-if="!isEmailValid && !isEdit">
                     <td colspan="2">
                       <div class="alert alert-danger" role="alert">
                         This email account was already registered. Please use another one.
@@ -150,6 +174,13 @@
                       </div>
                     </td>
                   </tr>
+                  <tr v-if="!isContactNumValid && !isEdit">
+                    <td colspan="2">
+                      <div class="alert alert-danger" role="alert">
+                        This contact number was already registered or invalid. Please use another one.
+                      </div>
+                    </td>
+                  </tr>
                   <tr>
                     <td colspan="2" style="padding: 5px">
                       <div class="mb-3">
@@ -178,7 +209,7 @@
                     </td>
                   </tr>
                 </table>
-                <button type="submit" class="btn btn-primary btn-md w-100 mb-2 btn-lg" v-if="!isEdit">
+                <button type="submit" class="btn btn-primary btn-md w-100 mb-2 btn-lg" v-if="!isEdit" :disabled="!isContactNumValid || !isEmailValid">
                   <ion-icon :icon="add" size="small" class="me-1"/>Add Patient
                 </button>
                 <button type="button" class="btn btn-primary btn-md w-100 mb-2 btn-lg" @click="updatePatient()" v-else>
@@ -219,7 +250,9 @@ import SettingsConstants from '../constants/settings.constants'
 export default defineComponent({
   name: 'PatientsPage',
   computed: mapState([
-      'sessionData'
+      'sessionData',
+      'showPatientsOnly',
+      'showAdminsOnly'
   ]),
   setup() {
     const doRefresh = function (event) {
@@ -240,7 +273,10 @@ export default defineComponent({
       isAddNewPatientOpen: false,
       isEdit: false,
       patientIdEdit: null,
+      allNumbers: [],
+      allNumbersTemp: [],
       isEmailValid: true,
+      isContactNumValid: true,
 
       userEmail: null,
       userFirstname: null,
@@ -254,6 +290,8 @@ export default defineComponent({
       userContact: null,
       userDateofbirth: null,
       userMaritalstatus: 1,
+      userLevel: 0,
+      userPassword: null,
 
     }
   },
@@ -268,6 +306,14 @@ export default defineComponent({
         var counter = [];
         counter = this.allEmails.filter(email => email.user_email.toLowerCase() == newVal.toLowerCase());
         !counter.length ? this.isEmailValid = true : this.isEmailValid = false ;
+      }
+    },
+    userContact: function (newVal) {
+      if (newVal) {
+        this.allNumbers = this.allNumbersTemp;
+        var counter = [];
+        counter = this.allNumbers.filter(num => num.user_contactnum == newVal);
+        !counter.length ? this.isContactNumValid = true : this.isContactNumValid = false ;
       }
     }
   },
@@ -307,22 +353,26 @@ export default defineComponent({
       this.userContact = patientItem.user_contactnum;
       this.userDateofbirth = patientItem.user_dob;
       this.userMaritalstatus = patientItem.user_maritalstatus;
+      this.userLevel = patientItem.user_level;
+      this.userPassword = patientItem.user_password;
     },
     updatePatient: function () {
       event.preventDefault();
       var bodyFormData = new FormData();
       bodyFormData.append('user_email', this.userEmail);
+      this.userPassword ? bodyFormData.append('user_password', this.userPassword) : bodyFormData.append('user_password', '');
       bodyFormData.append('user_firstname', this.userFirstname);
       bodyFormData.append('user_lastname', this.userLastname);
       this.userMiddlename ? bodyFormData.append('user_middlename', this.userMiddlename) : bodyFormData.append('user_middlename', '');
       this.userSuffix ? bodyFormData.append('user_suffix', this.userSuffix) : bodyFormData.append('user_suffix', '');
       bodyFormData.append('user_sex', this.userSex);
-      bodyFormData.append('user_address', this.userAddress);
-      bodyFormData.append('user_city', this.userCity);
-      bodyFormData.append('user_province', this.userProvince);
-      bodyFormData.append('user_contactnum', this.userContact);
-      bodyFormData.append('user_dob', this.userDateofbirth);
+      this.userAddress ? bodyFormData.append('user_address', this.userAddress) : bodyFormData.append('user_address', '');
+      this.userCity ? bodyFormData.append('user_city', this.userCity) : bodyFormData.append('user_city', '');
+      this.userProvince ? bodyFormData.append('user_province', this.userProvince) : bodyFormData.append('user_province', '');
+      this.userContact ? bodyFormData.append('user_contactnum', this.userContact) : bodyFormData.append('user_contactnum', '');
+      this.userDateofbirth ? bodyFormData.append('user_dob', this.userDateofbirth) : bodyFormData.append('user_dob', '');
       bodyFormData.append('user_maritalstatus', this.userMaritalstatus);
+      bodyFormData.append('user_level', this.userLevel);
 
       axios({
           method: "post",
@@ -345,7 +395,7 @@ export default defineComponent({
             } else {
                 Swal.fire(
                   'Error!',
-                  'Something went wrong when creating your account!',
+                  'Something went wrong when updating Patient/User Information!',
                   'error'
                 );
             }
@@ -358,19 +408,19 @@ export default defineComponent({
       event.preventDefault();
       var bodyFormData = new FormData();
       bodyFormData.append('user_email', this.userEmail);
-      bodyFormData.append('user_password', '');
+      this.userPassword ? bodyFormData.append('user_password', this.userPassword) : bodyFormData.append('user_password', '');
       bodyFormData.append('user_firstname', this.userFirstname);
       bodyFormData.append('user_lastname', this.userLastname);
       this.userMiddlename ? bodyFormData.append('user_middlename', this.userMiddlename) : bodyFormData.append('user_middlename', '');
       this.userSuffix ? bodyFormData.append('user_suffix', this.userSuffix) : bodyFormData.append('user_suffix', '');
       bodyFormData.append('user_sex', this.userSex);
-      bodyFormData.append('user_address', this.userAddress);
-      bodyFormData.append('user_city', this.userCity);
-      bodyFormData.append('user_province', this.userProvince);
-      bodyFormData.append('user_contactnum', this.userContact);
-      bodyFormData.append('user_dob', this.userDateofbirth);
+      this.userAddress ? bodyFormData.append('user_address', this.userAddress) : bodyFormData.append('user_address', '');
+      this.userCity ? bodyFormData.append('user_city', this.userCity) : bodyFormData.append('user_city', '');
+      this.userProvince ? bodyFormData.append('user_province', this.userProvince) : bodyFormData.append('user_province', '');
+      this.userContact ? bodyFormData.append('user_contactnum', this.userContact) : bodyFormData.append('user_contactnum', '');
+      this.userDateofbirth ? bodyFormData.append('user_dob', this.userDateofbirth) : bodyFormData.append('user_dob', '');
       bodyFormData.append('user_maritalstatus', this.userMaritalstatus);
-      bodyFormData.append('user_level', '0');
+      bodyFormData.append('user_level', this.userLevel);
 
       axios({
           method: "post",
@@ -413,13 +463,28 @@ export default defineComponent({
       this.userContact = null;
       this.userDateofbirth = null;
       this.userMaritalstatus = 1;
+      this.userPassword = null;
+      this.userLevel = 0;
     },
     storePatientsDetails: function (details) {
       store.commit('SET_PATIENTVIEW_DETAILS', details);
     },
     getAllPatients: function () {
       this.allPatients = [];
-      axios.get(SettingsConstants.BASE_URL + 'users.rest.php?type=getallpatients', { crossdomain: true })
+      var url = null;
+      if (this.sessionData.user_level == '3') {
+        if (this.showPatientsOnly) {
+          url = 'users.rest.php?type=getallpatients';
+        } else if (this.showAdminsOnly) {
+          url = 'users.rest.php?type=getalladmins';
+        } else {
+          url = 'users.rest.php?type=all';
+        }
+      } else {
+        url = 'users.rest.php?type=getallpatients';
+      }
+
+      axios.get(SettingsConstants.BASE_URL + url , { crossdomain: true })
           .then(function (response) {
               if (response.data) {
                   this.allPatients = response.data;
@@ -447,14 +512,24 @@ export default defineComponent({
               }
           }.bind(this));
     },
+    getAllExistingContactNumbers: function () {
+      this.allNumbers = [];
+      axios.get(SettingsConstants.BASE_URL + 'users.rest.php?type=allnumbers', { crossdomain: true })
+          .then(function (response) {
+              if (response.data) {
+                  this.allNumbers = response.data;
+                  this.allNumbersTemp = this.allNumbers;
+              }
+          }.bind(this));
+    },
     onclickDeleteUser: function (user) {
         Swal.fire({
         title: 'Remove' + user.fullName + ' ?',
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6C757D',
         confirmButtonText: 'Yes, remove it!'
       }).then((result) => {
         if (result.isConfirmed) {
@@ -477,6 +552,13 @@ export default defineComponent({
   mounted() {
     this.getAllPatients();
     this.getAllExistingEmails();
+    this.getAllExistingContactNumbers();
+    this.emitter.on('isShowAdminChange', function () {
+      this.getAllPatients();
+    }.bind(this));
+    this.emitter.on('isShowPatientChange', function () {
+      this.getAllPatients();
+    }.bind(this));
   },
 });
 </script>

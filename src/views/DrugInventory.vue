@@ -178,13 +178,23 @@ export default defineComponent({
       newDrugExpirationDate: null,
       appConstants: null,
       isEdit: false,
-      drugIdEdit: null
+      drugIdEdit: null,
+
+      drugQuantityBefore: null,
+      isQuantityLess: false
     }
   },
   watch: {
     searchValue: function (newVal) {
       this.allDrugs = this.allDrugsTemp;
       this.applySearch(newVal);
+    },
+    newDrugStock: function (newVal) {
+      if (newVal < this.drugQuantityBefore && newVal) {
+        this.isQuantityLess = true;
+      } else {
+        this.isQuantityLess = false;
+      }
     }
   },
   setup() {
@@ -248,6 +258,8 @@ export default defineComponent({
       this.newDrugFlavor = drugItem.drug_flavor;
       this.newDrugRoute = drugItem.drug_route;
       this.newDrugExpirationDate = drugItem.drug_expirationdate;
+
+      this.drugQuantityBefore = drugItem.drug_quantity;
     },
     performDrugEdit: function () {
       var bodyFormData = new FormData();
@@ -265,6 +277,9 @@ export default defineComponent({
       })
           .then(function (response) {
             if (response.data == 1) {
+                if (this.isQuantityLess) {
+                  this.recordQuantityChange(this.drugIdEdit, (parseInt(this.drugQuantityBefore) - this.newDrugStock));
+                }
                 Swal.fire(
                   'Success!',
                   this.newDrugName + ' has been edited!',
@@ -359,6 +374,15 @@ export default defineComponent({
                 console.log(response.data);
               }
           }.bind(this));
+      this.recordQuantityChange(drug.id, 1);
+    },
+    recordQuantityChange: function (drugid, val) {
+      axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=recordstock&drugid=' + drugid + '&quantity=' + val, { crossdomain: true })
+        .then(function (response) {
+            if (response.data) {
+              console.log(response.data);
+            }
+        }.bind(this));
     },
     onclickDeleteDrug: function (drug) {
         Swal.fire({
@@ -366,8 +390,8 @@ export default defineComponent({
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6C757D',
         confirmButtonText: 'Yes, remove it!'
       }).then((result) => {
         if (result.isConfirmed) {

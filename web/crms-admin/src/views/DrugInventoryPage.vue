@@ -221,7 +221,7 @@ export default {
         text: "You won't be able to revert this!",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#0D6EFD',
+        confirmButtonColor: '#d33',
         cancelButtonColor: '#6C757D',
         confirmButtonText: 'Yes, remove it!'
       }).then((result) => {

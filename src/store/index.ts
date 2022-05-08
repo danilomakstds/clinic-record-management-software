@@ -7,7 +7,9 @@ export default createStore({
     drugViewDetails: [],
     patientViewDetails: [],
     appointmentViewDetails: [],
-    isAppointmentListToday: true
+    isAppointmentListToday: true,
+    showPatientsOnly: null,
+    showAdminsOnly: null,
   },
   mutations: {
     SET_SESSION_DATA: function (state, sessionData) {
@@ -36,7 +38,13 @@ export default createStore({
     },
     SET_TODAY_APPOINTMENT_LIST: function (state, isAppointmentListToday) {
       state.isAppointmentListToday = isAppointmentListToday;
-    }
+    },
+    SET_SHOW_ADMINS_ONLY: function (state, showAdminsOnly) {
+      state.showAdminsOnly = showAdminsOnly;
+    },
+    SET_SHOW_PATIENTS_ONLY: function (state, showPatientsOnly) {
+      state.showPatientsOnly = showPatientsOnly;
+    },
   },
   getters: {
 
