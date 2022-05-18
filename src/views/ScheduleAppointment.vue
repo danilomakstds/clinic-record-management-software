@@ -189,6 +189,22 @@
                     <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
                     <ion-label><strong>Blood Pressure: </strong> {{apdModalData.app_patient_bp}}</ion-label>
                   </ion-item>
+                  <ion-item v-if="prescribedDrugList.length">
+                    <ion-label><h4 class="mb-3"><strong>Drug for release</strong></h4>
+                      <div class="w-100 pe-3">
+                        <ul class="list-group list-group-flush">
+                          <li class="list-group-item" v-for="drug in prescribedDrugList" :key="drug.drugid">
+                            <img src="../../resources/drug-icon-mod.jpg" style="height:30px" class="rounded-circle me-2"/>
+                            {{drug.drugname}}
+                            <span class="badge rounded-pill bg-info ms-2">{{drug.quanity}}</span>
+                            <button type="button" class="btn btn-danger float-end" @click="removeRelease(drug.drugid)">
+                              <ion-icon :icon="trashOutline"></ion-icon>
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </ion-label>
+                  </ion-item>
                   </span>
                 </ion-list>
 
@@ -217,6 +233,7 @@
                   </ion-item>
                 </ion-list>
                 <ion-list v-if="sessionData.user_level == 2">
+                  
                   <ion-item>
                     <ion-label>
                       <h5><strong>Diagnosis</strong></h5>
@@ -230,6 +247,22 @@
                       <h5><strong>Prescription</strong></h5>
                       <div>
                         <textarea class="form-control" style="height:100px; border-radius: 15px" v-model="appPrescription" required></textarea>
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-label>
+                      <div>
+                        <h5><strong>Add Release Drug</strong></h5><br/>
+                        <form @submit="addToDrugRelease()">
+                          <div class="input-group mb-3">
+                              <select class="form-select form-select-lg" v-model="selectedDrugId">
+                                <option v-for="drug in drugList" :key="drug.id" :value="drug.id">{{drug.drug_name}} <span v-if="drug.drug_flavor">({{drug.drug_flavor}})</span></option>
+                              </select>
+                              <input type="number" class="form-control form-control-md ms-2" placeholder="Quantity" v-model="selectedQuantity" required>
+                              <button type="submit" class="btn btn-primary ms-2">Add</button>
+                          </div>
+                        </form>
                       </div>
                     </ion-label>
                   </ion-item>
@@ -384,6 +417,7 @@ export default  defineComponent({
   data() {
     return {
       today: null,
+      drugList: [],
       isAppointmentModalOpen: false,
       selectedDate: moment().format(),
       appointmentSlots: [],
@@ -419,6 +453,10 @@ export default  defineComponent({
       editAppointmentSlots: null,
       daysConstant: null,
       workdays: [],
+
+      selectedDrugId: 1,
+      selectedQuantity: null,
+      prescribedDrugList: [],
     }
   },
   setup() {
@@ -514,6 +552,7 @@ export default  defineComponent({
       this.isAddDiagnosisPrescription = !this.isAddDiagnosisPrescription;
       if (this.isAddDiagnosisPrescription) {
         this.apdModalData = appData;
+        this.getAllDrugList();
       }
     },
     resetFields: function () {
@@ -554,6 +593,18 @@ export default  defineComponent({
           .catch(function (response) {
               console.log(response);
           });
+      
+      this.prescribedDrugList.forEach(function (drug){
+        var newval = (parseInt(drug.currentquantity)-parseInt(drug.quanity)).toString();
+        //drug.drug_quantity = newval;
+        axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=updatedrugquantity&drugid=' + drug.drugid + '&drug_quantity=' + newval, { crossdomain: true })
+            .then(function (response) {
+                if (response.data) {
+                  console.log(response.data);
+                }
+            }.bind(this));
+        this.recordQuantityChange(drug.drugid, drug.quanity);
+      }.bind(this));
     },
     moveToDoctorsQueue: function (details) {
       event.preventDefault();
@@ -589,6 +640,55 @@ export default  defineComponent({
           .catch(function (response) {
               console.log(response);
           });
+    },
+    getAllDrugList: function () {
+      axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=all', { crossdomain: true })
+        .then(function (response) {
+          if (response.data) {
+            this.drugList = response.data;
+          }
+        }.bind(this));
+    },
+    addToDrugRelease: function () {
+      event.preventDefault();
+      var checkDrugs = obj => obj.id === this.selectedDrugId;
+      if (!this.prescribedDrugList.some(checkDrugs)) {
+        var drugname = null;
+        var current_quantity = 0;
+        this.drugList.forEach( function (drug){
+          if (drug.id == this.selectedDrugId) {
+            drugname = drug.drug_name + (drug.drug_flavor ? '('+drug.drug_flavor+')': '');
+            current_quantity = drug.drug_quantity;
+          }
+        }.bind(this));
+        if (this.selectedQuantity <= current_quantity) {
+          this.prescribedDrugList.push(
+          {
+            'drugid' : this.selectedDrugId,
+            'quanity' : this.selectedQuantity,
+            'drugname': drugname,
+            'currentquantity': current_quantity
+          });
+        } else {
+           Swal.fire(
+            'Error!',
+            'Please input something lesser than the quantity we have ('+current_quantity+')',
+            'error'
+          );
+        }
+        
+      }
+    },
+    removeRelease: function (drugid) {
+      this.prescribedDrugList = this.prescribedDrugList.filter(item => item.drugid != drugid);
+    },
+    recordQuantityChange: function (drugid, val) {
+      axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=recordstock&drugid=' + drugid + '&quantity=' + val, { crossdomain: true })
+        .then(function (response) {
+            if (response.data) {
+              console.log(response.data);
+            }
+        }.bind(this));
     },
     getAllSchedule: function () {
        axios.get(SettingsConstants.BASE_URL + 'schedule.rest.php?type=all', { crossdomain: true })
