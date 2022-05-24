@@ -293,6 +293,7 @@ export default  defineComponent({
       this.userMiddlename ? bodyFormData.append('user_middlename', this.userMiddlename) : bodyFormData.append('user_middlename', '');
       this.userSuffix ? bodyFormData.append('user_suffix', this.userSuffix) : bodyFormData.append('user_suffix', '');
       bodyFormData.append('user_sex', this.userSex);
+      bodyFormData.append('user_level', '0');
       bodyFormData.append('user_address', this.userAddress);
       bodyFormData.append('user_city', this.userCity);
       bodyFormData.append('user_province', this.userProvince);
