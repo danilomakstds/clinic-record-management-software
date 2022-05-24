@@ -113,6 +113,26 @@
           <tr>
             <td colspan="2" style="padding: 5px">
               <div class="mb-3">
+                <label for="address" class="form-label">Select Sitio/Purok</label>
+                <select class="form-control" id="exampleFormControlSelect1" v-model="selectedSitio">
+                  <option value="">None</option>
+                  <option value="Abog">Abog</option>
+                  <option value="Arapiles">Arapiles</option>
+                  <option value="Bantolinao">Bantolinao</option>
+                  <option value="Baryong Daan">Baryong Daan</option>
+                  <option value="Buntod">Buntod</option>
+                  <option value="Common">Common</option>
+                  <option value="Kalantukan">Kalantukan</option>
+                  <option value="Kalubinhan">Kalubinhan</option>
+                  <option value="Kambaghak">Kambaghak</option>
+                  <option value="Tubaon">Tubaon</option>
+                </select>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding: 5px">
+              <div class="mb-3">
                 <label for="address" class="form-label">Address</label>
                 <textarea class="form-control form-control-lg" id="address" rows="3" required v-model="userAddress"></textarea>
               </div>
@@ -214,6 +234,17 @@ export default  defineComponent({
       } else {
         this.isContactNumValid = false;
       }
+    },
+    selectedSitio: function (newVal) {
+      if (newVal) {
+        this.userAddress = newVal + ', Brgy. Simborio';
+        this.userCity = 'Pamplona';
+        this.userProvince = 'Negros Oriental';
+      } else {
+        this.userAddress = null;
+        this.userCity = null;
+        this.userProvince = null;
+      }
     }
   },
   setup() {
@@ -246,7 +277,8 @@ export default  defineComponent({
       allNumbers: [],
       allNumbersTemp: [],
       isEmailValid: true,
-      isContactNumValid: true
+      isContactNumValid: true,
+      selectedSitio: null
     }
   },
   components: { IonContent, IonPage, IonRefresher, IonRefresherContent },

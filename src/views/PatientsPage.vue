@@ -25,6 +25,9 @@
             <ion-item-option class="pe-2 ps-2" @click="toggleAddPatientModal(user)">
               <ion-icon :icon="createOutline"/>
             </ion-item-option>
+            <ion-item-option class="pe-2 ps-2" @click="toggleShowHistoryModal(user)" color="tertiary">
+              <ion-icon :icon="folderOutline"/>
+            </ion-item-option>
             <!-- <ion-item-option @click="onclickDeleteUser(user)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
               <ion-icon :icon="trashOutline"/>
             </ion-item-option> -->
@@ -221,6 +224,94 @@
         </ion-content>
       </ion-modal>
 
+      <ion-modal
+        :is-open="isShowHistoryOpen"
+        @didDismiss="toggleShowHistoryModal()"
+      >
+        <ion-header>
+          <ion-toolbar @click="dismiss()" class="ms-2">
+            <ion-icon :icon="chevronBackOutline" slot="start" size="large"/>
+            <ion-title slot="start">Back</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content>
+          <div class="p-2">
+            <div class="d-flex align-items-center h-75" v-if="!allAppointments.length">
+              <div class="text-center">
+                <img src="../../resources/slide-3.png" />
+                <span style="font-size:15px" class="mt-2">No Items to show here!<br/>This patient has no appointment history</span>
+              </div>
+            </div>
+            <div v-if="allAppointments.length">
+              <ion-card class="animated4 animatedFadeInUp fadeInUp" v-for="app in allAppointments" :key="app.id">
+                <ion-item @click="toggleShowMoreModal(app)">
+                  <ion-icon :icon="calendarOutline" slot="start"></ion-icon>
+                  <ion-label>{{app.agendaTitle}}</ion-label>
+                  <ion-icon :icon="arrowForwardOutline" slot="end"></ion-icon>
+                </ion-item>
+
+                <ion-card-content>
+                  <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>{{app.timeSlot}}<br/>
+                  <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>{{app.convertedDate}}<br/>
+                  <span class="badge rounded-pill bg-success mt-4" style="font-size: 13px">Done</span>
+                </ion-card-content>
+              </ion-card>
+            </div>
+          </div>
+        </ion-content>
+      </ion-modal>
+
+      <ion-modal
+        :is-open="isShowMoreDetailsOpen"
+        :breakpoints="[0.1, 0.7, 0.85]"
+        :initialBreakpoint="0.7"
+        @didDismiss="toggleShowMoreModal()"
+      >
+        <ion-content>
+          <div class="p-4">
+             <ion-list>
+                <ion-item>
+                  <ion-icon :icon="personCircleOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{appFullname}}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{appTimeSlot}}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{appConvertedDate}}</ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon :icon="informationCircleOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{appConcern}}</ion-label>
+                </ion-item>
+                <ion-item>
+                    <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-light text-dark">Height</span> {{appHeight}} cm</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-light text-dark">Weight</span> {{appWeight}} kg</ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
+                    <ion-label><span class="badge bg-light text-dark">Blood Pressure</span> {{appBP}}</ion-label>
+                  </ion-item>
+                <ion-item>
+                  <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label><span class="badge bg-danger">Diagnosis</span> {{appDiagnosis}}</ion-label>
+                </ion-item>
+                <ion-item @click="printPrescription(app)">
+                  <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
+                  <ion-label>{{appPrescription}}</ion-label>
+                  <ion-icon :icon="printOutline" slot="end"></ion-icon>
+                </ion-item>
+             </ion-list>
+          </div>
+        </ion-content>
+      </ion-modal>
+
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button @click="toggleAddPatientModal()">
           <ion-icon :icon="addOutline"></ion-icon>
@@ -244,9 +335,12 @@ import Swal from 'sweetalert2';
 import store from '../store';
 import moment from 'moment'
 import { mapState } from 'vuex'
-import { chevronDownCircleOutline, addOutline, eyeOutline, createOutline, chevronBackOutline, trashOutline } from 'ionicons/icons';
+import { chevronDownCircleOutline, addOutline, eyeOutline, createOutline, chevronBackOutline, trashOutline, folderOutline, calendarOutline,
+timeOutline, arrowForwardOutline, accessibilityOutline, bandageOutline, informationCircleOutline, barbellOutline, speedometerOutline,
+personCircleOutline } from 'ionicons/icons';
 import axios from "axios";
 import SettingsConstants from '../constants/settings.constants'
+import AppConstants from '../constants/app.constants'
 
 export default defineComponent({
   name: 'PatientsPage',
@@ -263,7 +357,9 @@ export default defineComponent({
       }, 2000);
     }
     return {
-      chevronDownCircleOutline, addOutline, doRefresh, eyeOutline, createOutline, chevronBackOutline, trashOutline
+      chevronDownCircleOutline, addOutline, doRefresh, eyeOutline, createOutline, chevronBackOutline, trashOutline, folderOutline,
+      calendarOutline, timeOutline, arrowForwardOutline, accessibilityOutline, bandageOutline, informationCircleOutline, barbellOutline,
+      speedometerOutline, personCircleOutline
     }
   },
   data() {
@@ -294,6 +390,19 @@ export default defineComponent({
       userLevel: 0,
       userPassword: null,
 
+      appointmentSlots: [],
+      isShowHistoryOpen: false,
+      isShowMoreDetailsOpen: false,
+      appAgenda: null,
+      appTimeSlot: null,
+      appConvertedDate: null,
+      appPrescription: null,
+      appDiagnosis: null,
+      appConcern: null,
+      appFullname: null,
+      appHeight: null,
+      appWeight: null,
+      appBP: null,
     }
   },
   watch: {
@@ -339,6 +448,39 @@ export default defineComponent({
         this.editPatientItem(isEdit);
       } else {
         this.isEdit = false;
+      }
+    },
+    toggleShowHistoryModal: function (patient) {
+      if (patient) {
+        this.getAllAppointments(patient);
+      } else {
+        this.isShowHistoryOpen = false;
+      }
+    },
+    toggleShowMoreModal: function (app) {
+      this.isShowMoreDetailsOpen = !this.isShowMoreDetailsOpen;
+      if (app) {
+        this.appAgenda = app.agendaTitle;
+        this.appTimeSlot = app.timeSlot;
+        this.appConvertedDate = app.convertedDate;
+        this.appPrescription = app.app_prescription;
+        this.appDiagnosis = app.app_diagnosis;
+        this.appConcern = app.app_patientconcerns;
+        this.appFullname = app.fullName;
+        this.appHeight = app.app_patient_height;
+        this.appWeight = app.app_patient_weight;
+        this.appBP = app.app_patient_bp;
+      } else {
+        this.appAgenda = null;
+        this.appTimeSlot = null;
+        this.appConvertedDate = null;
+        this.appPrescription = null;
+        this.appDiagnosis = null;
+        this.appConcern = null;
+        this.appFullname = null;
+        this.appHeight = null;
+        this.appWeight = null;
+        this.appBP = null;
       }
     },
     editPatientItem: function (patientItem) {
@@ -557,9 +699,67 @@ export default defineComponent({
             }.bind(this));
         }
       })
-    }
+    },
+    getAllAppointments: function(patient) {
+      this.allAppointments = [];
+      var url = 'appointment.rest.php?type=alladdreesedbyId&userId=' + patient.id;
+      axios.get(SettingsConstants.BASE_URL + url, { crossdomain: true })
+          .then(function (response) {
+              this.isShowHistoryOpen = true;
+              if (response.data) {
+                  this.allAppointments = response.data;
+                  this.allAppointments.forEach(function(app) {
+                    app.agendaTitle = null;
+                    app.timeSlot = null;
+                    app.fullName = null;
+                    app.fullName = patient.user_lastname + ', ' + patient.user_firstname + (patient.user_middlename ? ' '+patient.user_middlename : '');
+                    switch(parseInt(app.app_apptype)){
+                      case AppConstants.APPOINTMENT_SERVICES.LABOR.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.LABOR.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.CHECKUP.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.CHECKUP.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.COVID_VACCINE.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.COVID_VACCINE.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.ANTI_RABIES.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.ANTI_RABIES.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.ANTI_TETANUS.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.ANTI_TETANUS.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.TITLE
+                        break;
+                    }
+                    this.appointmentSlots.forEach( function (slot){
+                      if (slot.slotid == app.app_timeslot) {
+                        app.timeSlot = slot.sched;
+                        app.timeStart = slot.timestart;
+                        app.timeEnd = slot.timeend;
+                      }
+                    }.bind(app));
+                    app.convertedDate = moment(app.app_date).format('LL');
+                  }.bind(this));
+              }
+          }.bind(this));
+    },
+    getAllSchedule: function () {
+       axios.get(SettingsConstants.BASE_URL + 'schedule.rest.php?type=all', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.appointmentSlots = response.data;
+              this.getAllAppointments();
+            }
+          }.bind(this));
+    },
   },
   mounted() {
+    this.getAllSchedule();
     this.getAllPatients();
     this.getAllExistingEmails();
     this.getAllExistingContactNumbers();
