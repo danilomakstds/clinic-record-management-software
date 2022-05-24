@@ -36,7 +36,7 @@
                     <td>{{drug.drug_expirationdate}}</td>
                     <td>
                       <button @click="editOrAddDrugItem(drug)" data-bs-toggle="modal" data-bs-target="#editAddDrug" type="button" class="btn btn-primary btn-sm me-2" title="Edit drug"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                      <button @click="onclickDeleteDrug(drug)" type="button" class="btn btn-danger btn-sm me-2" title="Remove drug"><font-awesome-icon :icon="['fa', 'trash-can']" /></button>
+                      <!-- <button @click="onclickDeleteDrug(drug)" type="button" class="btn btn-danger btn-sm me-2" title="Remove drug"><font-awesome-icon :icon="['fa', 'trash-can']" /></button> -->
                     </td>
                   </tr>
                 </tbody>

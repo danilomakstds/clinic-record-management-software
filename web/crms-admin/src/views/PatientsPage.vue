@@ -55,7 +55,7 @@
                     <td>{{user.age}}</td>
                     <td>
                       <button type="button" @click="editAddUser(user)" class="btn btn-primary btn-sm me-2" title="Edit user"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                      <button type="button" @click="onclickDeleteUser(user)" class="btn btn-danger btn-sm me-2" title="Remove user"><font-awesome-icon :icon="['fa', 'trash-can']" /></button>
+                      <!-- <button type="button" @click="onclickDeleteUser(user)" class="btn btn-danger btn-sm me-2" title="Remove user"><font-awesome-icon :icon="['fa', 'trash-can']" /></button> -->
                     </td>
                   </tr>
                 </tbody>

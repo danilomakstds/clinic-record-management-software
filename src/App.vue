@@ -93,6 +93,12 @@
             </ion-item>
             <ion-item>
               <ion-label>
+                <h5><strong>Age</strong></h5>
+                {{patientViewDetails.age}}
+              </ion-label>
+            </ion-item>
+            <ion-item>
+              <ion-label>
                 <h5><strong>Marital Status</strong></h5>
                 {{returnMaritalStatusValue(patientViewDetails.user_maritalstatus)}}
               </ion-label>

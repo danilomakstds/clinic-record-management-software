@@ -49,7 +49,7 @@
                       <td>
                         <button @click="editAppointment(app)" :disabled="app.app_status > 0" data-bs-toggle="modal" data-bs-target="#editAppointment" type="button" class="btn btn-primary btn-sm me-2" title="Edit appointment"><font-awesome-icon :icon="['fa', 'pen']" /></button>
                         <button @click="viewAppointment(app)" :disabled="app.app_status == 0" data-bs-toggle="modal" data-bs-target="#viewMore" type="button" class="btn btn-info btn-sm me-2 text-white" title="View more details"><font-awesome-icon :icon="['fa', 'eye']" /></button>
-                        <button @click="removeAppointment(app)" type="button" class="btn btn-danger btn-sm me-2" title="Remove appointment"><font-awesome-icon :icon="['fa', 'trash-can']" /></button>
+                        <!-- <button @click="removeAppointment(app)" type="button" class="btn btn-danger btn-sm me-2" title="Remove appointment"><font-awesome-icon :icon="['fa', 'trash-can']" /></button> -->
                       </td>
                     </tr>
                   </tbody>

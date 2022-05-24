@@ -41,7 +41,7 @@
             <span class="badge rounded-pill bg-primary mt-4" style="font-size: 13px" v-if="app.app_status == 1">Doctor's Queue</span>
             <span class="badge rounded-pill bg-success mt-4" style="font-size: 13px" v-if="app.app_status == 2">Done</span>
             <span v-if="sessionData.user_level == 3">
-              <button type="button" class="btn btn-danger float-end" @click="removeAppointment(app)" ><ion-icon :icon="trashOutline"></ion-icon></button>
+              <!-- <button type="button" class="btn btn-danger float-end" @click="removeAppointment(app)" ><ion-icon :icon="trashOutline"></ion-icon></button> -->
               <button type="button" class="btn btn-info float-end me-2 text-white" :disabled="app.app_status == 0" @click="toggleShowMoreModal(app)"><ion-icon :icon="eyeOutline"></ion-icon></button>
               <button type="button" class="btn btn-primary float-end me-2 text-white" :disabled="app.app_status != 0" @click="toggleEditAppointmentModal(app)"><ion-icon :icon="createOutline"></ion-icon></button>
             </span>
@@ -133,7 +133,7 @@
                 <ion-label>{{appointment.sched}}</ion-label>
                 <ion-icon :icon="chevronForwardOutline" slot="end"/>
               </ion-item>
-              <ion-item-divider v-if="appointment.slotid == 8">
+              <ion-item-divider v-if="appointment.timeend == '12:00:00'">
                 <ion-label>
                   Afternoon Schedule
                 </ion-label>

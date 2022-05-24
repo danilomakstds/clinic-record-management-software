@@ -25,9 +25,9 @@
             <ion-item-option class="pe-2 ps-2" @click="toggleAddPatientModal(user)">
               <ion-icon :icon="createOutline"/>
             </ion-item-option>
-            <ion-item-option @click="onclickDeleteUser(user)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
+            <!-- <ion-item-option @click="onclickDeleteUser(user)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
               <ion-icon :icon="trashOutline"/>
-            </ion-item-option>
+            </ion-item-option> -->
           </ion-item-options>
           
 
@@ -242,6 +242,7 @@ IonModal, modalController
 } from '@ionic/vue';
 import Swal from 'sweetalert2';
 import store from '../store';
+import moment from 'moment'
 import { mapState } from 'vuex'
 import { chevronDownCircleOutline, addOutline, eyeOutline, createOutline, chevronBackOutline, trashOutline } from 'ionicons/icons';
 import axios from "axios";
@@ -489,6 +490,15 @@ export default defineComponent({
               if (response.data) {
                   this.allPatients = response.data;
                   this.allPatients.forEach( function (patient){
+                    if (patient.user_dob) {
+                      if ((moment(patient.user_dob, 'YYYYMMDD').fromNow()).includes('years')) {
+                        patient.age = (moment(patient.user_dob, 'YYYYMMDD').fromNow()).split(" ")[0];
+                      } else {
+                        patient.age = '< 1 year';
+                      }
+                    } else {
+                      patient.age = "-";
+                    }
                     patient.fullName = patient.user_firstname + ' ' + patient.user_middlename + ' ' + patient.user_lastname + ' ' + patient.user_suffix; 
                   });
                   this.allPatientsTemp = this.allPatients;

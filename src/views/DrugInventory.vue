@@ -24,9 +24,9 @@
               <ion-item-option class="pe-2 ps-2" @click="toggleAddDrugModal(drug)">
                 <ion-icon :icon="createOutline"/>
               </ion-item-option>
-              <ion-item-option @click="onclickDeleteDrug(drug)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
+              <!-- <ion-item-option @click="onclickDeleteDrug(drug)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
                 <ion-icon :icon="trashOutline"/>
-              </ion-item-option>
+              </ion-item-option> -->
             </ion-item-options>
 
             <ion-item>
