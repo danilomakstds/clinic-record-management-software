@@ -25,7 +25,7 @@
             <ion-item-option class="pe-2 ps-2" @click="toggleAddPatientModal(user)">
               <ion-icon :icon="createOutline"/>
             </ion-item-option>
-            <ion-item-option class="pe-2 ps-2" @click="toggleShowHistoryModal(user)" color="tertiary">
+            <ion-item-option class="pe-2 ps-2" @click="toggleShowHistoryModal(user)" color="tertiary" v-if="user.user_level == 0">
               <ion-icon :icon="folderOutline"/>
             </ion-item-option>
             <!-- <ion-item-option @click="onclickDeleteUser(user)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
