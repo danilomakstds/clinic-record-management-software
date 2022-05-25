@@ -70,7 +70,7 @@
                     <td colspan="2">
                       <div class="mb-3 w-100">
                         <label class="form-label">User Type</label>
-                        <select class="form-select w-100" required v-model="userLevel">
+                        <select class="form-select w-100" required v-model="userLevel" :disabled="sessionData.user_level != 3">
                           <option :value="0">Patient</option>
                           <option :value="1">Nurse</option>
                           <option :value="2">Doctor</option>
@@ -147,6 +147,26 @@
                       </div>
                     </td>
                   </tr>
+                  <tr>
+                  <td colspan="2" style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="address" class="form-label">Select Sitio/Purok</label>
+                      <select class="form-control" id="exampleFormControlSelect1" v-model="selectedSitio">
+                        <option value="">None</option>
+                        <option value="Abog">Abog</option>
+                        <option value="Arapiles">Arapiles</option>
+                        <option value="Bantolinao">Bantolinao</option>
+                        <option value="Baryong Daan">Baryong Daan</option>
+                        <option value="Buntod">Buntod</option>
+                        <option value="Common">Common</option>
+                        <option value="Kalantukan">Kalantukan</option>
+                        <option value="Kalubinhan">Kalubinhan</option>
+                        <option value="Kambaghak">Kambaghak</option>
+                        <option value="Tubaon">Tubaon</option>
+                      </select>
+                    </div>
+                  </td>
+                </tr>
                   <tr>
                     <td colspan="2" style="padding: 5px">
                       <div class="mb-3">
@@ -403,6 +423,8 @@ export default defineComponent({
       appHeight: null,
       appWeight: null,
       appBP: null,
+
+      selectedSitio: null
     }
   },
   watch: {
@@ -424,6 +446,17 @@ export default defineComponent({
         var counter = [];
         counter = this.allNumbers.filter(num => num.user_contactnum == newVal);
         !counter.length ? this.isContactNumValid = true : this.isContactNumValid = false ;
+      }
+    },
+    selectedSitio: function (newVal) {
+      if (newVal) {
+        this.userAddress = newVal + ', Brgy. Simborio';
+        this.userCity = 'Pamplona';
+        this.userProvince = 'Negros Oriental';
+      } else {
+        this.userAddress = null;
+        this.userCity = null;
+        this.userProvince = null;
       }
     }
   },
@@ -551,7 +584,7 @@ export default defineComponent({
       event.preventDefault();
       var bodyFormData = new FormData();
       bodyFormData.append('user_email', this.userEmail);
-      this.userPassword ? bodyFormData.append('user_password', this.userPassword) : bodyFormData.append('user_password', '');
+      this.userPassword ? bodyFormData.append('user_password', this.userPassword) : bodyFormData.append('user_password', 'patient1234');
       bodyFormData.append('user_firstname', this.userFirstname);
       bodyFormData.append('user_lastname', this.userLastname);
       this.userMiddlename ? bodyFormData.append('user_middlename', this.userMiddlename) : bodyFormData.append('user_middlename', '');
