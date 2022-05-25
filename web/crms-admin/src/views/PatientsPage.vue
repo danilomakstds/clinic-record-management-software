@@ -368,7 +368,7 @@ export default {
       event.preventDefault();
       var bodyFormData = new FormData();
       bodyFormData.append('user_email', this.eaUserEmail);
-      this.eaUserPassword ? bodyFormData.append('user_password', this.eaUserPassword) : bodyFormData.append('user_password', '');
+      this.eaUserPassword ? bodyFormData.append('user_password', this.eaUserPassword) : bodyFormData.append('user_password', 'patient1234');
       bodyFormData.append('user_firstname', this.eaFirstName);
       bodyFormData.append('user_lastname', this.eaLastName);
       this.eaMiddleName ? bodyFormData.append('user_middlename', this.eaMiddleName) : bodyFormData.append('user_middlename', '');
