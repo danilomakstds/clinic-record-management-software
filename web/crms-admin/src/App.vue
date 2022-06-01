@@ -1,5 +1,7 @@
 <template>
   <router-view/>
+  <div class="text-center" style="font-size: 13px">Copyright © 2022 NORSU Information Technology
+  <p>All Rights Reserved</p></div>
 </template>
 
 <style lang="scss">

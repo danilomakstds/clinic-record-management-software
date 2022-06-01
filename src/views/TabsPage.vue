@@ -63,6 +63,8 @@
             </ion-item>
         </ion-list>
     </ion-content>
+    <span class="text-center" style="font-size: 11px">Copyright © 2022<br/><b style="font-size: 13px">NORSU Information Technology</b>
+<p>All Rights Reserved</p></span>
 </ion-menu>
 </template>
 
