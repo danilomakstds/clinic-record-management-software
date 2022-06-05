@@ -9,7 +9,7 @@ export default createStore({
     appointmentViewDetails: [],
     isAppointmentListToday: true,
     showPatientsOnly: null,
-    showAdminsOnly: null,
+    showAdminsOnly: null
   },
   mutations: {
     SET_SESSION_DATA: function (state, sessionData) {
@@ -44,7 +44,7 @@ export default createStore({
     },
     SET_SHOW_PATIENTS_ONLY: function (state, showPatientsOnly) {
       state.showPatientsOnly = showPatientsOnly;
-    },
+    }
   },
   getters: {
 

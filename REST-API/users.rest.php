@@ -194,6 +194,15 @@ switch ($_GET['type']) {
       $rs = mysqli_query($con, $sqlString);
       echo(mysqli_affected_rows($con));
       break;
+   case 'updatepassword':
+      $user_password = $_POST['user_password'];
+      $user_newpassword = $_POST['new_password'];
+      $userid = $_GET['userid'];
+
+      $sqlString = "UPDATE `users` SET `user_password` = '{$user_newpassword}' WHERE id = '{$userid}' AND user_password = '{$user_password}'";
+      $rs = mysqli_query($con, $sqlString);
+      echo(mysqli_affected_rows($con));
+      break;
    case 'deletepatient':
       $userId = $_GET['userId'];
       $sqlString = "DELETE FROM `users` WHERE `users`.`id` = '{$userId}'";

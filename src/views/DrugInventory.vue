@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title><img src="../../resources/logo.png" style="height:20px" class="me-2"/>Drug Inventory</ion-title>
+        <ion-title><img src="../../resources/logo.png" style="height:20px" class="me-2" />Drug Inventory</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -17,49 +17,48 @@
 
       <div class=" overflow-hidden" style="margin-bottom:90px; margin-top: 65px">
         <ion-item-sliding v-for="drug in allDrugs" :key="drug.id">
-            <ion-item-options side="start">
-              <ion-item-option @click="storeDrugDetails(drug)" color="secondary" class="pe-2 ps-2" data-bs-toggle="modal" data-bs-target="#drugViewModal">
-                <ion-icon :icon="eyeOutline"/>
-              </ion-item-option>
-              <ion-item-option class="pe-2 ps-2" @click="toggleAddDrugModal(drug)">
-                <ion-icon :icon="createOutline"/>
-              </ion-item-option>
-              <!-- <ion-item-option @click="onclickDeleteDrug(drug)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
+          <ion-item-options side="start">
+            <ion-item-option @click="storeDrugDetails(drug)" color="secondary" class="pe-2 ps-2" data-bs-toggle="modal"
+              data-bs-target="#drugViewModal">
+              <ion-icon :icon="eyeOutline" />
+            </ion-item-option>
+            <ion-item-option class="pe-2 ps-2" @click="toggleAddDrugModal(drug)">
+              <ion-icon :icon="createOutline" />
+            </ion-item-option>
+            <!-- <ion-item-option @click="onclickDeleteDrug(drug)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
                 <ion-icon :icon="trashOutline"/>
               </ion-item-option> -->
-            </ion-item-options>
+          </ion-item-options>
 
-            <ion-item>
-              <ion-avatar slot="start">
-                <img src="../../resources/drug-icon-mod.jpg">
-              </ion-avatar>
-              <ion-label>{{ drug.fullName }} <span class="badge rounded-pill bg-secondary" v-if="drug.drug_flavor !== 'null'">{{drug.drug_flavor}}</span></ion-label>
-              <ion-badge slot="end" color="success">{{drug.drug_quantity}}</ion-badge>
-            </ion-item>
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="../../resources/drug-icon-mod.jpg">
+            </ion-avatar>
+            <ion-label>{{ drug.fullName }} <span class="badge rounded-pill bg-secondary"
+                v-if="drug.drug_flavor !== 'null'">{{ drug.drug_flavor }}</span></ion-label>
+            <ion-badge slot="end" :color="drug.drug_quantity < 10 ? 'danger' : 'success'">{{ drug.drug_quantity }}
+            </ion-badge>
+          </ion-item>
 
-            <ion-item-options side="end">
-              <ion-item-option class="pe-2 ps-2" @click="onAddClick(drug)">
-                <ion-icon :icon="addOutline"/>
-              </ion-item-option>
-              <ion-item-option class="pe-2 ps-2" @click="onSubtractClick(drug)">
-                <ion-icon :icon="removeOutline"/>
-              </ion-item-option>
-            </ion-item-options>
+          <ion-item-options side="end">
+            <ion-item-option class="pe-2 ps-2" @click="onAddClick(drug)">
+              <ion-icon :icon="addOutline" />
+            </ion-item-option>
+            <ion-item-option class="pe-2 ps-2" @click="onSubtractClick(drug)">
+              <ion-icon :icon="removeOutline" />
+            </ion-item-option>
+          </ion-item-options>
         </ion-item-sliding>
       </div>
-      
+
       <!-- Sheet Modal -->
-      <ion-modal
-        :is-open="isAddDrugModalOpen"
-        :breakpoints="[0.1, 0.7, 0.85]"
-        :initialBreakpoint="0.7"
-        @didDismiss="toggleAddDrugModal()"
-      >
+      <ion-modal :is-open="isAddDrugModalOpen" :breakpoints="[0.1, 0.7, 0.85]" :initialBreakpoint="0.7"
+        @didDismiss="toggleAddDrugModal()">
         <ion-content>
           <div class="p-4">
             <form @submit="addNewDrug">
               <label class="form-label mb-0" style="font-size:12px">Add Drug</label>
-              <hr class="mt-2 mb-2"/>
+              <hr class="mt-2 mb-2" />
               <table class="w-100">
                 <tr>
                   <td colspan="2" class="p-2">
@@ -90,15 +89,15 @@
                     <div class="mb-2">
                       <label class="form-label">Route / Administration</label>
                       <select class="form-select" v-model="newDrugRoute" required>
-                        <option :value="appConstants.ORAL.VALUE">{{appConstants.ORAL.TITLE}}</option>
-                        <option :value="appConstants.TOPICAL.VALUE">{{appConstants.TOPICAL.TITLE}}</option>
-                        <option :value="appConstants.INJECTION.VALUE">{{appConstants.INJECTION.TITLE}}</option>
-                        <option :value="appConstants.SUBLINGUAL.VALUE">{{appConstants.SUBLINGUAL.TITLE}}</option>
-                        <option :value="appConstants.RECTAL.VALUE">{{appConstants.RECTAL.TITLE}}</option>
-                        <option :value="appConstants.VAGINAL.VALUE">{{appConstants.VAGINAL.TITLE}}</option>
-                        <option :value="appConstants.OCULAR.VALUE">{{appConstants.OCULAR.TITLE}}</option>
-                        <option :value="appConstants.OTIC.VALUE">{{appConstants.OTIC.TITLE}}</option>
-                        <option :value="appConstants.NEBULIZATION.VALUE">{{appConstants.NEBULIZATION.TITLE}}</option>
+                        <option :value="appConstants.ORAL.VALUE">{{ appConstants.ORAL.TITLE }}</option>
+                        <option :value="appConstants.TOPICAL.VALUE">{{ appConstants.TOPICAL.TITLE }}</option>
+                        <option :value="appConstants.INJECTION.VALUE">{{ appConstants.INJECTION.TITLE }}</option>
+                        <option :value="appConstants.SUBLINGUAL.VALUE">{{ appConstants.SUBLINGUAL.TITLE }}</option>
+                        <option :value="appConstants.RECTAL.VALUE">{{ appConstants.RECTAL.TITLE }}</option>
+                        <option :value="appConstants.VAGINAL.VALUE">{{ appConstants.VAGINAL.TITLE }}</option>
+                        <option :value="appConstants.OCULAR.VALUE">{{ appConstants.OCULAR.TITLE }}</option>
+                        <option :value="appConstants.OTIC.VALUE">{{ appConstants.OTIC.TITLE }}</option>
+                        <option :value="appConstants.NEBULIZATION.VALUE">{{ appConstants.NEBULIZATION.TITLE }}</option>
                       </select>
                     </div>
                   </td>
@@ -119,10 +118,10 @@
                 </tr>
               </table>
               <button type="submit" class="btn btn-primary btn-md w-100 mb-2 btn-lg" v-if="!isEdit">
-                <ion-icon :icon="add" size="small" class="me-1"/>Add New Drug
+                <ion-icon :icon="add" size="small" class="me-1" />Add New Drug
               </button>
               <button type="button" class="btn btn-primary btn-md w-100 mb-2 btn-lg" @click="performDrugEdit()" v-else>
-                <ion-icon :icon="createOutline" size="small" class="me-1"/>Edit Drug
+                <ion-icon :icon="createOutline" size="small" class="me-1" />Edit Drug
               </button>
             </form>
           </div>
@@ -143,10 +142,10 @@
 import { defineComponent } from 'vue';
 import { IonPage,
 IonHeader, IonToolbar, IonTitle,
-IonContent, IonSearchbar, IonBadge,
-IonModal, IonItem, IonAvatar, IonItemOption, 
-IonItemOptions, IonItemSliding, IonRefresher, IonRefresherContent,
-modalController, IonFab, IonFabButton,
+  IonContent, IonSearchbar, IonBadge,
+  IonModal, IonItem, IonAvatar, IonItemOption,
+  IonItemOptions, IonItemSliding, IonRefresher, IonRefresherContent,
+  modalController, IonFab, IonFabButton,
 } from '@ionic/vue';
 import { addOutline, chevronDownCircleOutline, trashOutline, removeOutline, createOutline, eyeOutline, medkitOutline } from 'ionicons/icons';
 import Swal from 'sweetalert2';
@@ -160,7 +159,7 @@ import { mapState } from 'vuex'
 export default defineComponent({
   name: 'DrugInventory',
   computed: mapState([
-      'sessionData'
+    'sessionData'
   ]),
   data() {
     return {
@@ -215,7 +214,7 @@ export default defineComponent({
     IonItemOption, IonItemOptions, IonItemSliding,
     IonRefresher, IonRefresherContent,
     IonFab, IonFabButton,
-    },
+  },
   methods: {
     async dismiss() {
       modalController.dismiss({
@@ -225,15 +224,15 @@ export default defineComponent({
     getAllDrugs: function () {
       this.allDrugs = [];
       axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=all', { crossdomain: true })
-          .then(function (response) {
-              if (response.data) {
-                  this.allDrugs = response.data;
-                  this.allDrugs.forEach( function (drug){
-                    drug.fullName = drug.drug_name + ' (' + drug.drug_dose + ')';
-                  });
-                  this.allDrugsTemp = this.allDrugs;
-              }
-          }.bind(this));
+        .then(function (response) {
+          if (response.data) {
+            this.allDrugs = response.data;
+            this.allDrugs.forEach(function (drug) {
+              drug.fullName = drug.drug_name + ' (' + drug.drug_dose + ')';
+            });
+            this.allDrugsTemp = this.allDrugs;
+          }
+        }.bind(this));
     },
     applySearch: function (newVal) {
       if (newVal) {
@@ -270,39 +269,39 @@ export default defineComponent({
       bodyFormData.append('drug_quantity', this.newDrugStock);
       bodyFormData.append('drug_expirationdate', this.newDrugExpirationDate);
       axios({
-          method: "post",
-          url: SettingsConstants.BASE_URL + "drug.rest.php?type=editdrug&drugid=" + this.drugIdEdit,
-          data: bodyFormData,
-          headers: { "Content-Type": "multipart/form-data" },
+        method: "post",
+        url: SettingsConstants.BASE_URL + "drug.rest.php?type=editdrug&drugid=" + this.drugIdEdit,
+        data: bodyFormData,
+        headers: { "Content-Type": "multipart/form-data" },
       })
-          .then(function (response) {
-            if (response.data == 1) {
-                if (this.isQuantityLess) {
-                  this.recordQuantityChange(this.drugIdEdit, (parseInt(this.drugQuantityBefore) - this.newDrugStock));
-                }
-                Swal.fire(
-                  'Success!',
-                  this.newDrugName + ' has been edited!',
-                  'success'
-                );
-                setTimeout(function(){
-                  this.isEdit = false;
-                  this.dismiss();
-                  this.resetFields();
-                  this.drugIdEdit = null;
-                  this.getAllDrugs();
-                }.bind(this), 500); 
-            } else {
-                Swal.fire(
-                  'Error!',
-                  'Something went wrong when editing drug item!',
-                  'error'
-                );
+        .then(function (response) {
+          if (response.data == 1) {
+            if (this.isQuantityLess) {
+              this.recordQuantityChange(this.drugIdEdit, (parseInt(this.drugQuantityBefore) - this.newDrugStock));
             }
-          }.bind(this))
-          .catch(function (response) {
-              console.log(response);
-          });
+            Swal.fire(
+              'Success!',
+              this.newDrugName + ' has been edited!',
+              'success'
+            );
+            setTimeout(function () {
+              this.isEdit = false;
+              this.dismiss();
+              this.resetFields();
+              this.drugIdEdit = null;
+              this.getAllDrugs();
+            }.bind(this), 500);
+          } else {
+            Swal.fire(
+              'Error!',
+              'Something went wrong when editing drug item!',
+              'error'
+            );
+          }
+        }.bind(this))
+        .catch(function (response) {
+          console.log(response);
+        });
     },
     addNewDrug: function () {
       event.preventDefault();
@@ -315,34 +314,34 @@ export default defineComponent({
       bodyFormData.append('drug_expirationdate', this.newDrugExpirationDate);
 
       axios({
-          method: "post",
-          url: SettingsConstants.BASE_URL + "drug.rest.php?type=adddrug",
-          data: bodyFormData,
-          headers: { "Content-Type": "multipart/form-data" },
+        method: "post",
+        url: SettingsConstants.BASE_URL + "drug.rest.php?type=adddrug",
+        data: bodyFormData,
+        headers: { "Content-Type": "multipart/form-data" },
       })
-          .then(function (response) {
-            if (response.data == 1) {
-                Swal.fire(
-                  'Success!',
-                  this.newDrugName + ' has been added!',
-                  'success'
-                );
-                setTimeout(function(){
-                  this.dismiss();
-                  this.resetFields();
-                  this.getAllDrugs();
-                }.bind(this), 500); 
-            } else {
-                Swal.fire(
-                  'Error!',
-                  'Something went wrong when creating drug item!',
-                  'error'
-                );
-            }
-          }.bind(this))
-          .catch(function (response) {
-              console.log(response);
-          });
+        .then(function (response) {
+          if (response.data == 1) {
+            Swal.fire(
+              'Success!',
+              this.newDrugName + ' has been added!',
+              'success'
+            );
+            setTimeout(function () {
+              this.dismiss();
+              this.resetFields();
+              this.getAllDrugs();
+            }.bind(this), 500);
+          } else {
+            Swal.fire(
+              'Error!',
+              'Something went wrong when creating drug item!',
+              'error'
+            );
+          }
+        }.bind(this))
+        .catch(function (response) {
+          console.log(response);
+        });
     },
     resetFields: function () {
       this.newDrugStock = 0;
@@ -356,25 +355,33 @@ export default defineComponent({
       store.commit('SET_DRUGVIEW_DETAILS', details);
     },
     onAddClick: function (drug) {
-      var newval = (parseInt(drug.drug_quantity)+1).toString();
+      var newval = (parseInt(drug.drug_quantity) + 1).toString();
       drug.drug_quantity = newval;
       axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=updatedrugquantity&drugid=' + drug.id + '&drug_quantity=' + newval, { crossdomain: true })
-          .then(function (response) {
-              if (response.data) {
-                console.log(response.data);
-              }
-          }.bind(this));
+        .then(function (response) {
+          if (response.data) {
+            console.log(response.data);
+          }
+        }.bind(this));
     },
     onSubtractClick: function (drug) {
-      var newval = (parseInt(drug.drug_quantity)-1).toString();
-      drug.drug_quantity = newval;
-      axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=updatedrugquantity&drugid=' + drug.id + '&drug_quantity=' + newval, { crossdomain: true })
+      if (drug.drug_quantity != 0) {
+        var newval = (parseInt(drug.drug_quantity) - 1).toString();
+        drug.drug_quantity = newval;
+        axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=updatedrugquantity&drugid=' + drug.id + '&drug_quantity=' + newval, { crossdomain: true })
           .then(function (response) {
-              if (response.data) {
-                console.log(response.data);
-              }
+            if (response.data) {
+              console.log(response.data);
+            }
           }.bind(this));
-      this.recordQuantityChange(drug.id, 1);
+        this.recordQuantityChange(drug.id, 1);
+      } else {
+        Swal.fire(
+          'Not allowed!',
+          'Stock quantity already 0!',
+          'warning'
+        )
+      }
     },
     recordQuantityChange: function (drugid, val) {
       axios.get(SettingsConstants.BASE_URL + 'drug.rest.php?type=recordstock&drugid=' + drugid + '&quantity=' + val, { crossdomain: true })
