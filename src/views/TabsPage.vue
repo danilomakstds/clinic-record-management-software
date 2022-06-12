@@ -21,7 +21,7 @@
 
                 <ion-tab-button tab="tab4" href="/tabs/prescription" v-if="sessionData.user_level == 0">
                     <ion-icon :icon="documentOutline" />
-                    <ion-label>Prescriptions</ion-label>
+                    <ion-label>Medical History</ion-label>
                 </ion-tab-button>
 
                 <ion-tab-button tab="tab5" @click="openFirst()">

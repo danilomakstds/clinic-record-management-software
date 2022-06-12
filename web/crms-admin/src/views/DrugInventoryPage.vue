@@ -1,47 +1,56 @@
 <template>
-  <nav-component/>
+  <nav-component />
   <div class="appointments p-4">
     <div class="card">
-        <div class="card-body">
-            <div class="overflow-hidden mb-2">
-              <input type="email" class="form-control w-25 float-start" placeholder="Search Drug" v-model="searchValue">
-              <button @click="editOrAddDrugItem" data-bs-toggle="modal" data-bs-target="#editAddDrug" type="button" class="btn btn-primary float-end me-2 btn-sm"><font-awesome-icon :icon="['fa', 'plus']" /> Add Drug</button>
-            </div>
-            <table class="table table-striped" style="font-size:14px">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Drug ID</th>
-                    <th scope="col">Info</th>
-                    <th scope="col">Flavor</th>
-                    <th scope="col">Route / Administration</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Expiration Date</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="drug in allDrugs" :key="drug.id">
-                    <td scope="row">
-                      <img src="../../resources/drug-icon-mod.jpg" style="height:35px" class="rounded-circle me-2">
-                      {{drug.drug_name}}
-                    </td>
-                    <td>{{drug.id}}</td>
-                    <td>{{drug.drug_dose}}</td>
-                    <td>{{drug.drug_flavor}}</td>
-                    <td>
-                      <span :class="'badge rounded-pill '+drug.route_color">{{drug.route}}</span>
-                    </td>
-                    <td>{{drug.drug_quantity}}</td>
-                    <td>{{drug.drug_expirationdate}}</td>
-                    <td>
-                      <button @click="editOrAddDrugItem(drug)" data-bs-toggle="modal" data-bs-target="#editAddDrug" type="button" class="btn btn-primary btn-sm me-2" title="Edit drug"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                      <!-- <button @click="onclickDeleteDrug(drug)" type="button" class="btn btn-danger btn-sm me-2" title="Remove drug"><font-awesome-icon :icon="['fa', 'trash-can']" /></button> -->
-                    </td>
-                  </tr>
-                </tbody>
-            </table>
+      <div class="card-body">
+        <div class="overflow-hidden mb-2">
+          <input type="email" class="form-control w-25 float-start" placeholder="Search Drug" v-model="searchValue">
+          <button @click="editOrAddDrugItem" data-bs-toggle="modal" data-bs-target="#editAddDrug" type="button"
+            class="btn btn-primary float-end me-2 btn-sm">
+            <font-awesome-icon :icon="['fa', 'plus']" /> Add Drug
+          </button>
         </div>
+        <table class="table table-striped" style="font-size:14px">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Drug ID</th>
+              <th scope="col">Info</th>
+              <th scope="col">Flavor</th>
+              <th scope="col">Route / Administration</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Expiration Date</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="drug in allDrugs" :key="drug.id">
+              <td scope="row">
+                <img src="../../resources/drug-icon-mod.jpg" style="height:35px" class="rounded-circle me-2">
+                {{drug.drug_name}}
+              </td>
+              <td>{{drug.id}}</td>
+              <td>{{drug.drug_dose}}</td>
+              <td>{{drug.drug_flavor}}</td>
+              <td>
+                <span :class="'badge rounded-pill '+drug.route_color">{{drug.route}}</span>
+              </td>
+              <td>{{drug.drug_quantity}}</td>
+              <td>{{drug.drug_expirationdate}}</td>
+              <td>
+                <button @click="editOrAddDrugItem(drug)" data-bs-toggle="modal" data-bs-target="#editAddDrug"
+                  type="button" class="btn btn-primary btn-sm me-2" title="Edit drug">
+                  <font-awesome-icon :icon="['fa', 'pen']" />
+                </button>
+                <button @click="onclickDeleteDrug(drug)" type="button" class="btn btn-danger btn-sm me-2"
+                  title="Remove drug">
+                  <font-awesome-icon :icon="['fa', 'trash-can']" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -61,55 +70,56 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form @submit="addNewDrug()">
-        <div class="modal-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <div class="mb-3">
-                <label style="font-size: 14px" class="form-label fw-bold">Drug Name</label>
-                <input type="text" class="form-control" v-model="newDrugName" required>
-              </div>
-              <div class="mb-3">
-                <label style="font-size: 14px" class="form-label fw-bold">Info</label>
-                <input type="text" class="form-control" v-model="newDrugInfo" required>
-              </div>
-              <div class="mb-3">
-                <label style="font-size: 14px" class="form-label fw-bold">Flavor</label>
-                <input type="text" class="form-control" v-model="newDrugFlavor">
-              </div>
-              <div class="mb-3">
-                <label style="font-size: 14px" class="form-label fw-bold">Route / Administration</label>
-                <select class="form-select" v-model="newDrugRoute" required>
-                  <option :value="appConstants.ORAL.VALUE">{{appConstants.ORAL.TITLE}}</option>
-                  <option :value="appConstants.TOPICAL.VALUE">{{appConstants.TOPICAL.TITLE}}</option>
-                  <option :value="appConstants.INJECTION.VALUE">{{appConstants.INJECTION.TITLE}}</option>
-                  <option :value="appConstants.SUBLINGUAL.VALUE">{{appConstants.SUBLINGUAL.TITLE}}</option>
-                  <option :value="appConstants.RECTAL.VALUE">{{appConstants.RECTAL.TITLE}}</option>
-                  <option :value="appConstants.VAGINAL.VALUE">{{appConstants.VAGINAL.TITLE}}</option>
-                  <option :value="appConstants.OCULAR.VALUE">{{appConstants.OCULAR.TITLE}}</option>
-                  <option :value="appConstants.OTIC.VALUE">{{appConstants.OTIC.TITLE}}</option>
-                  <option :value="appConstants.NEBULIZATION.VALUE">{{appConstants.NEBULIZATION.TITLE}}</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label style="font-size: 14px" class="form-label fw-bold">Quantity / Remaining Stock</label>
-                <input type="number" class="form-control" v-model="newDrugStock">
-              </div>
-              <div class="mb-3">
-                <label style="font-size: 14px" class="form-label fw-bold">Expiration Date</label>
-                <input type="date" class="form-control" v-model="newDrugExpirationDate" required>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <span v-if="selectedDrugItem.id">
-              <button type="button"  @click="performDrugEdit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
-          </span>
-          <span v-else>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="mb-3">
+                  <label style="font-size: 14px" class="form-label fw-bold">Drug Name</label>
+                  <input type="text" class="form-control" v-model="newDrugName" required>
+                </div>
+                <div class="mb-3">
+                  <label style="font-size: 14px" class="form-label fw-bold">Info</label>
+                  <input type="text" class="form-control" v-model="newDrugInfo" required>
+                </div>
+                <div class="mb-3">
+                  <label style="font-size: 14px" class="form-label fw-bold">Flavor</label>
+                  <input type="text" class="form-control" v-model="newDrugFlavor">
+                </div>
+                <div class="mb-3">
+                  <label style="font-size: 14px" class="form-label fw-bold">Route / Administration</label>
+                  <select class="form-select" v-model="newDrugRoute" required>
+                    <option :value="appConstants.ORAL.VALUE">{{appConstants.ORAL.TITLE}}</option>
+                    <option :value="appConstants.TOPICAL.VALUE">{{appConstants.TOPICAL.TITLE}}</option>
+                    <option :value="appConstants.INJECTION.VALUE">{{appConstants.INJECTION.TITLE}}</option>
+                    <option :value="appConstants.SUBLINGUAL.VALUE">{{appConstants.SUBLINGUAL.TITLE}}</option>
+                    <option :value="appConstants.RECTAL.VALUE">{{appConstants.RECTAL.TITLE}}</option>
+                    <option :value="appConstants.VAGINAL.VALUE">{{appConstants.VAGINAL.TITLE}}</option>
+                    <option :value="appConstants.OCULAR.VALUE">{{appConstants.OCULAR.TITLE}}</option>
+                    <option :value="appConstants.OTIC.VALUE">{{appConstants.OTIC.TITLE}}</option>
+                    <option :value="appConstants.NEBULIZATION.VALUE">{{appConstants.NEBULIZATION.TITLE}}</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label style="font-size: 14px" class="form-label fw-bold">Quantity / Remaining Stock</label>
+                  <input type="number" class="form-control" v-model="newDrugStock">
+                </div>
+                <div class="mb-3">
+                  <label style="font-size: 14px" class="form-label fw-bold">Expiration Date</label>
+                  <input type="date" class="form-control" v-model="newDrugExpirationDate" required>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <span v-if="selectedDrugItem.id">
+              <button type="button" @click="performDrugEdit" class="btn btn-primary" data-bs-dismiss="modal">Save
+                changes</button>
+            </span>
+            <span v-else>
               <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
-          </span>
-        </div>
+            </span>
+          </div>
         </form>
       </div>
     </div>

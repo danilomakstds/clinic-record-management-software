@@ -1,124 +1,155 @@
 <template>
-  <nav-component/>
+  <nav-component />
   <div class="appointments p-4">
-    
+
     <div class="card">
-        <div class="card-body">
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Appointment List</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button" role="tab" aria-controls="schedule" aria-selected="false">Schedule</button>
-            </li>
-          </ul>
-          <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-              <br/>
-              <div class="overflow-hidden mb-2">
-                <input type="email" class="form-control w-25 float-start" placeholder="Search Appointment" v-model="searchValue">
-                <div class="form-check form-switch float-end">
-                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" v-model="isAppointmentListToday" value="true">
-                  <label class="form-check-label" for="flexSwitchCheckDefault">Show today's appointments</label>
-                </div>
+      <div class="card-body">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+              role="tab" aria-controls="home" aria-selected="true">Appointment List</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button"
+              role="tab" aria-controls="schedule" aria-selected="false">Schedule</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <br />
+            <div class="overflow-hidden mb-2">
+              <input type="email" class="form-control w-25 float-start" placeholder="Search Appointment"
+                v-model="searchValue">
+              <div class="form-check form-switch float-end">
+                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault"
+                  v-model="isAppointmentListToday" value="true">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Show today's appointments</label>
               </div>
-              <table class="table table-striped" style="font-size:14px">
+            </div>
+            <table class="table table-striped" style="font-size:14px">
+              <thead>
+                <tr>
+                  <th scope="col">Patient</th>
+                  <th scope="col">Appointment #</th>
+                  <th scope="col">Agenda</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Time Slot</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="app in allAppointments" :key="app.id">
+                  <td><img src="../../resources/avatar.svg" style="height:35px"
+                      class="rounded-circle me-2">{{app.fullName}}</td>
+                  <td>{{app.id}}</td>
+                  <td>{{app.agendaTitle}}</td>
+                  <td>{{app.convertedDate}}</td>
+                  <td>{{app.timeSlot}}</td>
+                  <td>
+                    <span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span>
+                    <span class="badge rounded-pill bg-primary" v-if="app.app_status == 1">Doctor's Queue</span>
+                    <span class="badge rounded-pill bg-secondary" v-if="app.app_status == 0">Created</span>
+                  </td>
+                  <td>
+                    <button @click="editAppointment(app)" :disabled="app.app_status > 0" data-bs-toggle="modal"
+                      data-bs-target="#editAppointment" type="button" class="btn btn-primary btn-sm me-2"
+                      title="Edit appointment">
+                      <font-awesome-icon :icon="['fa', 'pen']" />
+                    </button>
+                    <button @click="viewAppointment(app)" :disabled="app.app_status == 0" data-bs-toggle="modal"
+                      data-bs-target="#viewMore" type="button" class="btn btn-info btn-sm me-2 text-white"
+                      title="View more details">
+                      <font-awesome-icon :icon="['fa', 'eye']" />
+                    </button>
+                    <button @click="removeAppointment(app)" type="button" class="btn btn-danger btn-sm me-2"
+                      title="Remove appointment">
+                      <font-awesome-icon :icon="['fa', 'trash-can']" />
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
+            <br />
+            <div class="overflow-hidden mb-2">
+              <div class="form-check form-switch float-end">
+                <button type="button" class="btn btn-primary btn-sm" @click="showAddEditScheduleModal()">
+                  <font-awesome-icon :icon="['fa', 'plus']" /> Add Schedule
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+
+                <div class="alert alert-info" role="alert" v-if="workdays.length">
+                  <ion-icon :icon="informationCircleOutline" class="me-3 float-start" size="large"></ion-icon>
+                  Doctor's schedule is
+                  <span v-for="(work, index) in workdays" :key="`work-${index}`">
+                    <span v-if="index == workdays.length - 1">and </span>
+                    <strong v-if="work == daysConstant.SUNDAY.VALUE">{{daysConstant.SUNDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                    <strong v-if="work == daysConstant.MONDAY.VALUE">{{daysConstant.MONDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                    <strong v-if="work == daysConstant.TUESDAY.VALUE">{{daysConstant.TUESDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                    <strong v-if="work == daysConstant.WEDNESDAY.VALUE">{{daysConstant.WEDNESDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                    <strong v-if="work == daysConstant.THURSDAY.VALUE">{{daysConstant.THURSDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                    <strong v-if="work == daysConstant.FRIDAY.VALUE">{{daysConstant.FRIDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                    <strong v-if="work == daysConstant.SATURDAY.VALUE">{{daysConstant.SATURDAY.TITLE}}s<span
+                        v-if="index != workdays.length - 1">, </span> </strong>
+                  </span>
+                  only.
+                </div>
+                <label class="mt-2">Select clinic schedule</label>
+                <select class="js-example-basic-multiple w-100" multiple="multiple" @change="workdaysChanged()">
+                  <option value="0">Sunday</option>
+                  <option value="1">Monday</option>
+                  <option value="2">Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                </select>
+              </div>
+              <div class="col-md-9">
+                <table class="table table-striped" style="font-size:14px">
                   <thead>
                     <tr>
-                      <th scope="col">Patient</th>
-                      <th scope="col">Appointment #</th>
-                      <th scope="col">Agenda</th>
-                      <th scope="col">Date</th>
-                      <th scope="col">Time Slot</th>
-                      <th scope="col">Status</th>
+                      <th scope="col">Time Start</th>
+                      <th scope="col">Time End</th>
+                      <th scope="col">Display as</th>
                       <th scope="col">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="app in allAppointments" :key="app.id">
-                      <td><img src="../../resources/avatar.svg" style="height:35px" class="rounded-circle me-2">{{app.fullName}}</td>
-                      <td>{{app.id}}</td>
-                      <td>{{app.agendaTitle}}</td>
-                      <td>{{app.convertedDate}}</td>
-                      <td>{{app.timeSlot}}</td>
+                    <tr v-for="slot in appointmentSlots" :key="slot.id">
+                      <td>{{slot.timestart}}</td>
+                      <td>{{slot.timeend}}</td>
+                      <td>{{slot.sched}}</td>
                       <td>
-                        <span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span>
-                        <span class="badge rounded-pill bg-primary" v-if="app.app_status == 1">Doctor's Queue</span>
-                        <span class="badge rounded-pill bg-secondary" v-if="app.app_status == 0">Created</span>
-                      </td>
-                      <td>
-                        <button @click="editAppointment(app)" :disabled="app.app_status > 0" data-bs-toggle="modal" data-bs-target="#editAppointment" type="button" class="btn btn-primary btn-sm me-2" title="Edit appointment"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                        <button @click="viewAppointment(app)" :disabled="app.app_status == 0" data-bs-toggle="modal" data-bs-target="#viewMore" type="button" class="btn btn-info btn-sm me-2 text-white" title="View more details"><font-awesome-icon :icon="['fa', 'eye']" /></button>
-                        <!-- <button @click="removeAppointment(app)" type="button" class="btn btn-danger btn-sm me-2" title="Remove appointment"><font-awesome-icon :icon="['fa', 'trash-can']" /></button> -->
+                        <button @click="showAddEditScheduleModal(slot)" type="button"
+                          class="btn btn-primary btn-sm me-2" title="Edit appointment">
+                          <font-awesome-icon :icon="['fa', 'pen']" />
+                        </button>
+                        <button @click="removeSchedule(slot)" type="button" class="btn btn-danger btn-sm me-2"
+                          title="Remove appointment">
+                          <font-awesome-icon :icon="['fa', 'trash-can']" />
+                        </button>
                       </td>
                     </tr>
                   </tbody>
-              </table>
-            </div>
-            <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
-              <br/>
-              <div class="overflow-hidden mb-2">
-                <div class="form-check form-switch float-end">
-                  <button type="button" class="btn btn-primary btn-sm" @click="showAddEditScheduleModal()"><font-awesome-icon :icon="['fa', 'plus']" /> Add Schedule</button>
-                </div>
+                </table>
               </div>
-              <div class="row">
-                <div class="col-md-3">
-                   
-                  <div class="alert alert-info" role="alert" v-if="workdays.length">
-                    <ion-icon :icon="informationCircleOutline" class="me-3 float-start" size="large"></ion-icon>
-                    Doctor's schedule is
-                    <span v-for="(work, index) in workdays" :key="`work-${index}`">
-                      <span v-if="index == workdays.length - 1">and </span> 
-                      <strong v-if="work == daysConstant.SUNDAY.VALUE">{{daysConstant.SUNDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                      <strong v-if="work == daysConstant.MONDAY.VALUE">{{daysConstant.MONDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                      <strong v-if="work == daysConstant.TUESDAY.VALUE">{{daysConstant.TUESDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                      <strong v-if="work == daysConstant.WEDNESDAY.VALUE">{{daysConstant.WEDNESDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                      <strong v-if="work == daysConstant.THURSDAY.VALUE">{{daysConstant.THURSDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                      <strong v-if="work == daysConstant.FRIDAY.VALUE">{{daysConstant.FRIDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                      <strong v-if="work == daysConstant.SATURDAY.VALUE">{{daysConstant.SATURDAY.TITLE}}s<span v-if="index != workdays.length - 1">, </span> </strong> 
-                    </span>
-                    only.
-                  </div>
-                  <label class="mt-2">Select clinic schedule</label>
-                  <select class="js-example-basic-multiple w-100" multiple="multiple" @change="workdaysChanged()">
-                    <option value="0">Sunday</option>
-                    <option value="1">Monday</option>
-                    <option value="2">Tuesday</option>
-                    <option value="3">Wednesday</option>
-                    <option value="4">Thursday</option>
-                    <option value="5">Friday</option>
-                    <option value="6">Saturday</option>
-                  </select>
-                </div>
-                <div class="col-md-9">
-                  <table class="table table-striped" style="font-size:14px">
-                      <thead>
-                        <tr>
-                          <th scope="col">Time Start</th>
-                          <th scope="col">Time End</th>
-                          <th scope="col">Display as</th>
-                          <th scope="col">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="slot in appointmentSlots" :key="slot.id">
-                          <td>{{slot.timestart}}</td>
-                          <td>{{slot.timeend}}</td>
-                          <td>{{slot.sched}}</td>
-                          <td>
-                            <button @click="showAddEditScheduleModal(slot)" type="button" class="btn btn-primary btn-sm me-2" title="Edit appointment"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                            <button @click="removeSchedule(slot)" type="button" class="btn btn-danger btn-sm me-2" title="Remove appointment"><font-awesome-icon :icon="['fa', 'trash-can']" /></button>
-                          </td>
-                        </tr>
-                      </tbody>
-                  </table>
-                </div>
-              </div>
-              
             </div>
+
           </div>
         </div>
+      </div>
     </div>
   </div>
 
@@ -131,32 +162,34 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form @submit="addNewtimeSlot()">
-        <div class="modal-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Time Start</label><br/>
-              <div class="mb-3">
-                <input type="text" class="form-control" placeholder="00:00:00" v-model="timeslotStart" required>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Time End</label><br/>
-              <div class="mb-3">
-                <input type="text" class="form-control" placeholder="00:00:00" v-model="timeslotEnd" required>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Name</label><br/>
-              <div class="mb-3">
-                <input type="text" class="form-control" placeholder="08:00 - 08:30 AM" v-model="timeslotName" required>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary" v-if="!isEditSchedule">Add Schedule</button>
-          <button type="button" class="btn btn-primary" v-if="isEditSchedule" @click="updateTimeSlot()">Update Schedule</button>
-        </div>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <label style="font-size:13px" class="fw-bold">Time Start</label><br />
+                <div class="mb-3">
+                  <input type="text" class="form-control" placeholder="00:00:00" v-model="timeslotStart" required>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <label style="font-size:13px" class="fw-bold">Time End</label><br />
+                <div class="mb-3">
+                  <input type="text" class="form-control" placeholder="00:00:00" v-model="timeslotEnd" required>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <label style="font-size:13px" class="fw-bold">Name</label><br />
+                <div class="mb-3">
+                  <input type="text" class="form-control" placeholder="08:00 - 08:30 AM" v-model="timeslotName"
+                    required>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" v-if="!isEditSchedule">Add Schedule</button>
+            <button type="button" class="btn btn-primary" v-if="isEditSchedule" @click="updateTimeSlot()">Update
+              Schedule</button>
+          </div>
         </form>
       </div>
     </div>
@@ -166,21 +199,22 @@
     <div class="modal-dialog">
       <div class="modal-content" v-if="viewedAppointment">
         <div class="modal-header">
-          <h5 class="modal-title">Appointment #{{viewedAppointment.id}} <span class="badge rounded-pill bg-success" v-if="viewedAppointment.app_status == 1">Done</span></h5>
+          <h5 class="modal-title">Appointment #{{viewedAppointment.id}} <span class="badge rounded-pill bg-success"
+              v-if="viewedAppointment.app_status == 1">Done</span></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Patient Concerns</label><br/>
+              <label style="font-size:13px" class="fw-bold">Patient Concerns</label><br />
               {{viewedAppointment.app_patientconcerns}}
             </li>
             <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Doctor's Diagnosis</label><br/>
+              <label style="font-size:13px" class="fw-bold">Doctor's Diagnosis</label><br />
               {{viewedAppointment.app_diagnosis}}
             </li>
             <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Doctor's Prescription</label><br/>
+              <label style="font-size:13px" class="fw-bold">Doctor's Prescription</label><br />
               {{viewedAppointment.app_prescription}}
             </li>
           </ul>
@@ -197,38 +231,35 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form @submit="saveAppointmentChanges()">
-        <div class="modal-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Agenda</label><br/>
-              <select class="form-select" v-model="editAgenda">
-                <option value="1">Labor</option>
-                <option value="2">Prenatal Care</option>
-                <option value="3">Checkup / Consultation</option>
-                <option value="4">COVID-19 Vaccination</option>
-                <option value="5">Anti Rabies Vaccination Care</option>
-                <option value="6">Anti Tetanus Vaccination</option>
-                <option value="7">Depo-Provera Injections</option>
-              </select>
-            </li>
-            <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Change Date</label><br/>
-              <div class="mb-3">
-                <input type="date" class="form-control" v-model="editDate"/>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <label style="font-size:13px" class="fw-bold">Chage Time Slot</label><br/>
-              <select class="form-select" v-model="editTimeSlot">
-                <option v-for="slot in appointmentSlots" :key="slot.id" :value="slot.slotid">{{slot.sched}}</option>
-              </select>
-            </li>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
-        </div>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <label style="font-size:13px" class="fw-bold">Agenda</label><br />
+                <select class="form-select" v-model="editAgenda">
+                  <option value="1">Prenatal Care</option>
+                  <option value="2">Checkup / Consultation</option>
+                  <option value="3">API Immunization</option>
+                  <option value="4">Family Planning</option>
+                </select>
+              </li>
+              <li class="list-group-item">
+                <label style="font-size:13px" class="fw-bold">Change Date</label><br />
+                <div class="mb-3">
+                  <input type="date" class="form-control" v-model="editDate" />
+                </div>
+              </li>
+              <li class="list-group-item">
+                <label style="font-size:13px" class="fw-bold">Chage Time Slot</label><br />
+                <select class="form-select" v-model="editTimeSlot">
+                  <option v-for="slot in appointmentSlots" :key="slot.id" :value="slot.slotid">{{slot.sched}}</option>
+                </select>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+          </div>
         </form>
       </div>
     </div>
@@ -343,26 +374,17 @@ export default {
                     }
                   }.bind(app));
                   switch(parseInt(app.app_apptype)){
-                    case AppConstants.APPOINTMENT_SERVICES.LABOR.VALUE:
-                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.LABOR.TITLE
-                      break;
                     case AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.VALUE:
                       app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.TITLE
                       break;
                     case AppConstants.APPOINTMENT_SERVICES.CHECKUP.VALUE:
                       app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.CHECKUP.TITLE
                       break;
-                    case AppConstants.APPOINTMENT_SERVICES.COVID_VACCINE.VALUE:
-                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.COVID_VACCINE.TITLE
+                    case AppConstants.APPOINTMENT_SERVICES.API.VALUE:
+                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.API.TITLE
                       break;
-                    case AppConstants.APPOINTMENT_SERVICES.ANTI_RABIES.VALUE:
-                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.ANTI_RABIES.TITLE
-                      break;
-                    case AppConstants.APPOINTMENT_SERVICES.ANTI_TETANUS.VALUE:
-                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.ANTI_TETANUS.TITLE
-                      break;
-                    case AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.VALUE:
-                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.TITLE
+                    case AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.VALUE:
+                      app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.TITLE
                       break;
                   }
                   this.appointmentSlots.forEach( function (slot){

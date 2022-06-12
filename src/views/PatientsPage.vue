@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title><img src="../../resources/logo.png" style="height:20px" class="me-2"/>Patients</ion-title>
+        <ion-title><img src="../../resources/logo.png" style="height:20px" class="me-2" />Patients</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -14,25 +14,28 @@
       <ion-toolbar class="pt-2" slot="fixed">
         <ion-searchbar placeholder="Filter Patients" v-model="searchValue"></ion-searchbar>
       </ion-toolbar>
-      <br/><br/>
+      <br /><br />
       <ion-list class="mt-2">
         <!-- Sliding item with text options on both sides -->
         <ion-item-sliding v-for="user in allPatients" :key="user.id">
           <ion-item-options side="start">
-            <ion-item-option @click="storePatientsDetails(user)" color="secondary" class="pe-2 ps-2" data-bs-toggle="modal" data-bs-target="#patientViewModal">
-              <ion-icon :icon="eyeOutline"/>
+            <ion-item-option @click="storePatientsDetails(user)" color="secondary" class="pe-2 ps-2"
+              data-bs-toggle="modal" data-bs-target="#patientViewModal">
+              <ion-icon :icon="eyeOutline" />
             </ion-item-option>
             <ion-item-option class="pe-2 ps-2" @click="toggleAddPatientModal(user)">
-              <ion-icon :icon="createOutline"/>
+              <ion-icon :icon="createOutline" />
             </ion-item-option>
-            <ion-item-option class="pe-2 ps-2" @click="toggleShowHistoryModal(user)" color="tertiary" v-if="user.user_level == 0">
-              <ion-icon :icon="folderOutline"/>
+            <ion-item-option class="pe-2 ps-2" @click="toggleShowHistoryModal(user)" color="tertiary"
+              v-if="user.user_level == 0">
+              <ion-icon :icon="folderOutline" />
             </ion-item-option>
-            <!-- <ion-item-option @click="onclickDeleteUser(user)" color="danger" class="pe-2 ps-2" v-if="sessionData.user_level == 3">
-              <ion-icon :icon="trashOutline"/>
-            </ion-item-option> -->
+            <ion-item-option @click="onclickDeleteUser(user)" color="danger" class="pe-2 ps-2"
+              v-if="sessionData.user_level == 3">
+              <ion-icon :icon="trashOutline" />
+            </ion-item-option>
           </ion-item-options>
-          
+
 
           <ion-item>
             <ion-avatar slot="start">
@@ -48,106 +51,108 @@
       </ion-list>
 
 
-            <!-- Sheet Modal -->
-      <ion-modal
-        :is-open="isAddNewPatientOpen"
-        @didDismiss="toggleAddPatientModal()"
-      >
+      <!-- Sheet Modal -->
+      <ion-modal :is-open="isAddNewPatientOpen" @didDismiss="toggleAddPatientModal()">
         <ion-header>
           <ion-toolbar @click="dismiss()" class="ms-2">
-            <ion-icon :icon="chevronBackOutline" slot="start" size="large"/>
+            <ion-icon :icon="chevronBackOutline" slot="start" size="large" />
             <ion-title slot="start">Back</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-content>
-          <div class="p-4" >
-              <label class="form-label mb-0" style="font-size:12px"><span v-if="!isEdit">Add</span><span v-else>Edit</span>
+          <div class="p-4">
+            <label class="form-label mb-0" style="font-size:12px"><span v-if="!isEdit">Add</span><span
+                v-else>Edit</span>
               <span v-if="sessionData.user_level != 3">Patient</span> <span v-else> User</span> Modal</label>
-              <hr class="mt-2 mb-2"/>
-              <form @submit="registerPatient">
-                <table class="w-100">
-                  <tr class="w-100">
-                    <td colspan="2">
-                      <div class="mb-3 w-100">
-                        <label class="form-label">User Type</label>
-                        <select class="form-select w-100" required v-model="userLevel" :disabled="sessionData.user_level != 3">
-                          <option :value="0">Patient</option>
-                          <option :value="1">Nurse</option>
-                          <option :value="2">Doctor</option>
-                          <option :value="3">Admin</option>
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="fname" class="form-label">First name</label>
-                        <input type="text" class="form-control form-control-lg" id="fname" required v-model="userFirstname">
-                      </div>
-                    </td>
-                    <td style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="lname" class="form-label">Last name</label>
-                        <input type="text" class="form-control form-control-lg" id="lname" required v-model="userLastname">
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="mname" class="form-label">Middle name</label>
-                        <input type="text" class="form-control form-control-lg" id="mname" v-model="userMiddlename">
-                      </div>
-                    </td>
-                    <td style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="suffix" class="form-label">Suffix name</label>
-                        <input type="text" class="form-control form-control-lg" id="suffix" v-model="userSuffix">
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td :colspan="(userLevel > 0) ? 1 : 2" style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control form-control-lg" id="email" required v-model="userEmail">
-                      </div>
-                    </td>
-                    <td v-if="userLevel > 0">
-                      <div class="mb-3">
-                        <label class="form-label">User Password</label>
-                        <input type="password" class="form-control form-control-lg" v-model="userPassword" required>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr v-if="!isEmailValid && !isEdit">
-                    <td colspan="2">
-                      <div class="alert alert-danger" role="alert">
-                        This email account was already registered. Please use another one.
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px">
-                      <label class="form-label">Sex</label>
-                    </td>
-                    <td style="padding: 5px">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="sex" value="1" id="sex1" checked v-model="userSex">
-                        <label class="form-check-label" for="sex1">
-                          Male
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="sex" value="2" id="sex2" v-model="userSex">
-                        <label class="form-check-label" for="sex2">
-                          Female
-                        </label>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
+            <hr class="mt-2 mb-2" />
+            <form @submit="registerPatient">
+              <table class="w-100">
+                <tr class="w-100">
+                  <td colspan="2">
+                    <div class="mb-3 w-100">
+                      <label class="form-label">User Type</label>
+                      <select class="form-select w-100" required v-model="userLevel"
+                        :disabled="sessionData.user_level != 3">
+                        <option :value="0">Patient</option>
+                        <option :value="1">Nurse</option>
+                        <option :value="2">Doctor</option>
+                        <option :value="3">Admin</option>
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="fname" class="form-label">First name</label>
+                      <input type="text" class="form-control form-control-lg" id="fname" required
+                        v-model="userFirstname">
+                    </div>
+                  </td>
+                  <td style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="lname" class="form-label">Last name</label>
+                      <input type="text" class="form-control form-control-lg" id="lname" required
+                        v-model="userLastname">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="mname" class="form-label">Middle name</label>
+                      <input type="text" class="form-control form-control-lg" id="mname" v-model="userMiddlename">
+                    </div>
+                  </td>
+                  <td style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="suffix" class="form-label">Suffix name</label>
+                      <input type="text" class="form-control form-control-lg" id="suffix" v-model="userSuffix">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td :colspan="(userLevel > 0) ? 1 : 2" style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control form-control-lg" id="email" required v-model="userEmail">
+                    </div>
+                  </td>
+                  <td v-if="userLevel > 0">
+                    <div class="mb-3">
+                      <label class="form-label">User Password</label>
+                      <input type="password" class="form-control form-control-lg" v-model="userPassword" required>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="!isEmailValid && !isEdit">
+                  <td colspan="2">
+                    <div class="alert alert-danger" role="alert">
+                      This email account was already registered. Please use another one.
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px">
+                    <label class="form-label">Sex</label>
+                  </td>
+                  <td style="padding: 5px">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="sex" value="1" id="sex1" checked
+                        v-model="userSex">
+                      <label class="form-check-label" for="sex1">
+                        Male
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="sex" value="2" id="sex2" v-model="userSex">
+                      <label class="form-check-label" for="sex2">
+                        Female
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
                   <td colspan="2" style="padding: 5px">
                     <div class="mb-3">
                       <label for="address" class="form-label">Select Sitio/Purok</label>
@@ -167,90 +172,94 @@
                     </div>
                   </td>
                 </tr>
-                  <tr>
-                    <td colspan="2" style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <textarea class="form-control form-control-lg" id="address" rows="3" required v-model="userAddress"></textarea>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="city" class="form-label">City / Municipality</label>
-                        <input type="text" class="form-control form-control-lg" id="city" required v-model="userCity">
-                      </div>
-                    </td>
-                    <td style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="province" class="form-label">Province</label>
-                        <input type="text" class="form-control form-control-lg" id="province" required v-model="userProvince">
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colspan="2" style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="contactnum" class="form-label">Contact Number</label>
-                        <input type="text" class="form-control form-control-lg" id="contactnum" maxlength="11" required v-model="userContact">
-                      </div>
-                    </td>
-                  </tr>
-                  <tr v-if="!isContactNumValid && !isEdit">
-                    <td colspan="2">
-                      <div class="alert alert-danger" role="alert">
-                        This contact number was already registered or invalid. Please use another one.
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colspan="2" style="padding: 5px">
-                      <div class="mb-3">
-                        <label for="dob" class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control form-control-lg" id="dob" required v-model="userDateofbirth">
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 5px">
-                      <label class="form-label">Marital Status</label>
-                    </td>
-                    <td style="padding: 5px">
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="maritalstatus" value="1" id="maritalstatus1" checked v-model="userMaritalstatus">
-                        <label class="form-check-label" for="maritalstatus1">
-                          Single
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input class="form-check-input" type="radio" name="maritalstatus" value="2" id="maritalstatus2" v-model="userMaritalstatus">
-                        <label class="form-check-label" for="maritalstatus2">
-                          Married
-                        </label>
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-                <button type="submit" class="btn btn-primary btn-md w-100 mb-2 btn-lg" v-if="!isEdit" :disabled="!isContactNumValid || !isEmailValid">
-                  <ion-icon :icon="add" size="small" class="me-1"/>Add Patient
-                </button>
-                <button type="button" class="btn btn-primary btn-md w-100 mb-2 btn-lg" @click="updatePatient()" v-else>
-                  <ion-icon :icon="createOutline" size="small" class="me-1"/>Edit Patient
-                </button>
-                <br/><br/><br/>
+                <tr>
+                  <td colspan="2" style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="address" class="form-label">Address</label>
+                      <textarea class="form-control form-control-lg" id="address" rows="3" required
+                        v-model="userAddress"></textarea>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="city" class="form-label">City / Municipality</label>
+                      <input type="text" class="form-control form-control-lg" id="city" required v-model="userCity">
+                    </div>
+                  </td>
+                  <td style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="province" class="form-label">Province</label>
+                      <input type="text" class="form-control form-control-lg" id="province" required
+                        v-model="userProvince">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="contactnum" class="form-label">Contact Number</label>
+                      <input type="text" class="form-control form-control-lg" id="contactnum" maxlength="11" required
+                        v-model="userContact">
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="!isContactNumValid && !isEdit">
+                  <td colspan="2">
+                    <div class="alert alert-danger" role="alert">
+                      This contact number was already registered or invalid. Please use another one.
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding: 5px">
+                    <div class="mb-3">
+                      <label for="dob" class="form-label">Date of Birth</label>
+                      <input type="date" class="form-control form-control-lg" id="dob" required
+                        v-model="userDateofbirth">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 5px">
+                    <label class="form-label">Marital Status</label>
+                  </td>
+                  <td style="padding: 5px">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="maritalstatus" value="1" id="maritalstatus1"
+                        checked v-model="userMaritalstatus">
+                      <label class="form-check-label" for="maritalstatus1">
+                        Single
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="maritalstatus" value="2" id="maritalstatus2"
+                        v-model="userMaritalstatus">
+                      <label class="form-check-label" for="maritalstatus2">
+                        Married
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              <button type="submit" class="btn btn-primary btn-md w-100 mb-2 btn-lg" v-if="!isEdit"
+                :disabled="!isContactNumValid || !isEmailValid">
+                <ion-icon :icon="add" size="small" class="me-1" />Add Patient
+              </button>
+              <button type="button" class="btn btn-primary btn-md w-100 mb-2 btn-lg" @click="updatePatient()" v-else>
+                <ion-icon :icon="createOutline" size="small" class="me-1" />Edit Patient
+              </button>
+              <br /><br /><br />
             </form>
           </div>
         </ion-content>
       </ion-modal>
 
-      <ion-modal
-        :is-open="isShowHistoryOpen"
-        @didDismiss="toggleShowHistoryModal()"
-      >
+      <ion-modal :is-open="isShowHistoryOpen" @didDismiss="toggleShowHistoryModal()">
         <ion-header>
           <ion-toolbar @click="dismiss()" class="ms-2">
-            <ion-icon :icon="chevronBackOutline" slot="start" size="large"/>
+            <ion-icon :icon="chevronBackOutline" slot="start" size="large" />
             <ion-title slot="start">Back</ion-title>
           </ion-toolbar>
         </ion-header>
@@ -259,7 +268,8 @@
             <div class="d-flex align-items-center h-75" v-if="!allAppointments.length">
               <div class="text-center">
                 <img src="../../resources/slide-3.png" />
-                <span style="font-size:15px" class="mt-2">No Items to show here!<br/>This patient has no appointment history</span>
+                <span style="font-size:15px" class="mt-2">No Items to show here!<br />This patient has no appointment
+                  history</span>
               </div>
             </div>
             <div v-if="allAppointments.length">
@@ -271,8 +281,8 @@
                 </ion-item>
 
                 <ion-card-content>
-                  <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>{{app.timeSlot}}<br/>
-                  <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>{{app.convertedDate}}<br/>
+                  <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>{{app.timeSlot}}<br />
+                  <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>{{app.convertedDate}}<br />
                   <span class="badge rounded-pill bg-success mt-4" style="font-size: 13px">Done</span>
                 </ion-card-content>
               </ion-card>
@@ -281,53 +291,49 @@
         </ion-content>
       </ion-modal>
 
-      <ion-modal
-        :is-open="isShowMoreDetailsOpen"
-        :breakpoints="[0.1, 0.7, 0.85]"
-        :initialBreakpoint="0.7"
-        @didDismiss="toggleShowMoreModal()"
-      >
+      <ion-modal :is-open="isShowMoreDetailsOpen" :breakpoints="[0.1, 0.7, 0.85]" :initialBreakpoint="0.7"
+        @didDismiss="toggleShowMoreModal()">
         <ion-content>
           <div class="p-4">
-             <ion-list>
-                <ion-item>
-                  <ion-icon :icon="personCircleOutline" slot="start" class="me-2"></ion-icon>
-                  <ion-label>{{appFullname}}</ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>
-                  <ion-label>{{appTimeSlot}}</ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>
-                  <ion-label>{{appConvertedDate}}</ion-label>
-                </ion-item>
-                <ion-item>
-                  <ion-icon :icon="informationCircleOutline" slot="start" class="me-2"></ion-icon>
-                  <ion-label>{{appConcern}}</ion-label>
-                </ion-item>
-                <ion-item>
-                    <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
-                    <ion-label><span class="badge bg-light text-dark">Height</span> {{appHeight}} cm</ion-label>
-                  </ion-item>
-                  <ion-item>
-                    <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
-                    <ion-label><span class="badge bg-light text-dark">Weight</span> {{appWeight}} kg</ion-label>
-                  </ion-item>
-                  <ion-item>
-                    <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
-                    <ion-label><span class="badge bg-light text-dark">Blood Pressure</span> {{appBP}}</ion-label>
-                  </ion-item>
-                <ion-item>
-                  <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
-                  <ion-label><span class="badge bg-danger">Diagnosis</span> {{appDiagnosis}}</ion-label>
-                </ion-item>
-                <ion-item @click="printPrescription(app)">
-                  <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
-                  <ion-label>{{appPrescription}}</ion-label>
-                  <ion-icon :icon="printOutline" slot="end"></ion-icon>
-                </ion-item>
-             </ion-list>
+            <ion-list>
+              <ion-item>
+                <ion-icon :icon="personCircleOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label>{{appFullname}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="timeOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label>{{appTimeSlot}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="calendarOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label>{{appConvertedDate}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="informationCircleOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label>{{appConcern}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="accessibilityOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label><span class="badge bg-light text-dark">Height</span> {{appHeight}} cm</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="barbellOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label><span class="badge bg-light text-dark">Weight</span> {{appWeight}} kg</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="speedometerOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label><span class="badge bg-light text-dark">Blood Pressure</span> {{appBP}}</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label><span class="badge bg-danger">Diagnosis</span> {{appDiagnosis}}</ion-label>
+              </ion-item>
+              <ion-item @click="printPrescription(app)">
+                <ion-icon :icon="bandageOutline" slot="start" class="me-2"></ion-icon>
+                <ion-label>{{appPrescription}}</ion-label>
+                <ion-icon :icon="printOutline" slot="end"></ion-icon>
+              </ion-item>
+            </ion-list>
           </div>
         </ion-content>
       </ion-modal>
@@ -625,6 +631,8 @@ export default defineComponent({
           .catch(function (response) {
               console.log(response);
           });
+
+      
     },
     resetFields: function () {
       this.userEmail = null;

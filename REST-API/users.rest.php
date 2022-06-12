@@ -20,7 +20,7 @@ switch ($_GET['type']) {
       }
       break;
    case 'nameonly':
-      $sqlString = "SELECT id, user_firstname, user_lastname, user_middlename FROM `users` WHERE id = '{$_GET['userId']}'";
+      $sqlString = "SELECT id, user_firstname, user_lastname, user_middlename, user_dob FROM `users` WHERE id = '{$_GET['userId']}'";
       $rs = mysqli_query($con, $sqlString);
       
       if(mysqli_num_rows($rs) > 0){

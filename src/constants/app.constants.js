@@ -52,13 +52,32 @@ const DAYS = {
 // ]
 
 const APPOINTMENT_SERVICES = {
-    LABOR: { VALUE: 1, TITLE: 'Labor' },
-    PRENATAL_CARE: { VALUE: 2, TITLE: 'Prenatal Care' },
-    CHECKUP: { VALUE: 3, TITLE: 'Checkup / Consultation' },
-    COVID_VACCINE: { VALUE: 4, TITLE: 'COVID-19 Vaccination' },
+    //LABOR: { VALUE: 1, TITLE: 'Labor' },
+    PRENATAL_CARE: { VALUE: 1, TITLE: 'Prenatal Care' },
+    CHECKUP: { VALUE: 2, TITLE: 'Checkup / Consultation' },
+    API: { VALUE: 3, TITLE: 'API Immunization' },
+    FAMILY_PLANNING: { VALUE: 4, TITLE: 'Family Planning' }
+    /*COVID_VACCINE: { VALUE: 4, TITLE: 'COVID-19 Vaccination' },
     ANTI_RABIES: { VALUE: 5, TITLE: 'Anti Rabies Vaccination' },
     ANTI_TETANUS: { VALUE: 6, TITLE: 'Anti Tetanus Vaccination' },
-    DEPO_PROVERA: { VALUE: 7, TITLE: 'Depo-Provera Injections' },
+    DEPO_PROVERA: { VALUE: 7, TITLE: 'Depo-Provera Injections' },*/
+
+}
+
+const MEDICAL_HISTORY = {
+    TB: { VALUE: '1', TITLE: 'Tuberculosis' },
+    HEART_DISEASE: { VALUE: '2', TITLE: 'Heart Diseases' },
+    DIABETIC: { VALUE: '3', TITLE: 'Diabetic' },
+    GOITER: { VALUE: '4', TITLE: 'Goiter' },
+    ASTHMA: { VALUE: '5', TITLE: 'Asthma' }
+}
+
+const BABY_STATUS = {
+    N: { VALUE: 'N', TITLE: 'Normal' },
+    S: { VALUE: 'S', TITLE: 'Stunted' },
+    O: { VALUE: 'O', TITLE: 'Obese / Overweight' },
+    WMAM: { VALUE: 'W-MAM', TITLE: 'Wasted MAM' },
+    WSAM: { VALUE: 'W-SAM', TITLE: 'Wasted SAM' }
 }
 
 export default {
@@ -67,5 +86,7 @@ export default {
     USER_SEX: USER_SEX,
     //APPOINTMENT_SLOTS: APPOINTMENT_SLOTS,
     APPOINTMENT_SERVICES: APPOINTMENT_SERVICES,
-    DAYS: DAYS
+    DAYS: DAYS,
+    MEDICAL_HISTORY: MEDICAL_HISTORY,
+    BABY_STATUS: BABY_STATUS
 }

@@ -42,6 +42,7 @@ import { chevronDownCircleOutline } from 'ionicons/icons';
 import SettingsConstants from '../constants/settings.constants';
 import axios from "axios";
 import store from '../store';
+import moment from 'moment'
 import { mapState } from 'vuex';
 
 export default  defineComponent({
@@ -83,6 +84,22 @@ export default  defineComponent({
       })
           .then(function (response) {
             if (response.data.length == 1) {
+
+              if (response.data[0].user_dob) {
+                var dob = moment(response.data[0].user_dob, 'YYYYMMDD').fromNow();
+                console.log(dob);
+                if ((dob).includes('years')) {
+                  response.data[0].age = (dob).split(" ")[0];
+                } else {
+                  if ((dob).includes('month')) {
+                    response.data[0].age = parseInt((dob).split(" ")[0]) / 12;
+                  } else {
+                    response.data[0].age = '< 1 month';
+                  }
+                }
+              } else {
+                response.data[0].age = "-";
+              }
                 this.showMessage = true;
                 this.message = "<strong>Success! </strong>";
                 this.messageType = "alert-success";

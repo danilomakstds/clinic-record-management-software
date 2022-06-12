@@ -129,13 +129,10 @@ export default {
         ],
       totalAgeCount: 0,
       sectionAppointment: [
-          { label: 'Labor', value: 0, color: '#198754', apptype: 1, appcount: 0 },
-          { label: 'Prenatal Care', value: 0, color: '#fd7e14', apptype: 2, appcount: 0 },
-          { label: 'Checkup / Consultation', value: 0, color: '#d63384', apptype: 3, appcount: 0 },
-          { label: 'COVID-19 Vaccination', value: 0, color: '#0d6efd', apptype: 4, appcount: 0 },
-          { label: 'Anti Rabies Vaccination', value: 0, color: '#6f42c1', apptype: 5, appcount: 0 },
-          { label: 'Anti Tetanus Vaccination', value: 0, color: '#0DCAF0', apptype: 6, appcount: 0 },
-          { label: 'Depo-Provera Injections', value: 0, color: '#DC3545', apptype: 7, appcount: 0 }
+        { label: 'Prenatal Care', value: 0, color: '#198754', apptype: 1, appcount: 0 },
+        { label: 'Checkup / Consultation', value: 0, color: '#fd7e14', apptype: 2, appcount: 0 },
+        { label: 'API Immunization', value: 0, color: '#d63384', apptype: 3, appcount: 0 },
+        { label: 'Family Planning', value: 0, color: '#0d6efd', apptype: 4, appcount: 0 }
         ],
       totalAppointmentCount: 0,
       drugDataRecords: [],

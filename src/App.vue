@@ -127,6 +127,9 @@
             @click="clearAppointmentView()"></button>
         </div>
         <div class="modal-body">
+          <div class="alert alert-info" role="alert">
+            <strong>API Immunization</strong> service is only available for patients aged 9 months/old and below.
+          </div>
           <form @submit="createAppointment(appointmentViewDetails)">
             <ion-list>
               <ion-item>
@@ -136,24 +139,21 @@
                   {{ appointmentViewDetails.sched }}
                 </ion-label>
               </ion-item>
-              <ion-item>
+              <ion-item v-if="sessionData">
                 <ion-label>
                   <h5><strong>Select Service</strong></h5>
                   <select class="form-select w-100" aria-label="Default select example" v-model="selectedAgenda"
                     required>
-                    <option value="1">Labor</option>
-                    <option value="2">Prenatal Care</option>
-                    <option value="3">Checkup / Consultation</option>
-                    <option value="4">COVID-19 Vaccination</option>
-                    <option value="5">Anti Rabies Vaccination Care</option>
-                    <option value="6">Anti Tetanus Vaccination</option>
-                    <option value="7">Depo-Provera Injections</option>
+                    <option value="1" :disabled="sessionData.user_sex != 2">Prenatal Care</option>
+                    <option value="2">Checkup / Consultation</option>
+                    <option value="3" :disabled="sessionData.age > 0.75">API Immunization</option>
+                    <option value="4" :disabled="sessionData.age < 18">Family Planning</option>
                   </select>
                 </ion-label>
               </ion-item>
               <ion-item>
                 <ion-label>
-                  <h5 class="mb-2"><strong>Symptopms / Concerns</strong></h5>
+                  <h5 class="mb-2"><strong>Symptopms / Concerns / More Information</strong></h5>
                   <textarea class="form-control" v-model="patientSymptoms" rows="3"></textarea>
                 </ion-label>
               </ion-item>
@@ -246,8 +246,9 @@ export default defineComponent({
       bodyFormData.append('app_userId', this.sessionData.id);
       bodyFormData.append('app_apptype', this.selectedAgenda);
       bodyFormData.append('app_timeslot', details.slotid);
-      bodyFormData.append('app_date', details.selectedDate);
+      bodyFormData.append('app_date', details.selectedDate.split("T")[0]);
       bodyFormData.append('app_patientconcerns', this.patientSymptoms);
+
       axios({
           method: "post",
           url: SettingsConstants.BASE_URL + "appointment.rest.php?type=addappointment",

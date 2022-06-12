@@ -1,66 +1,84 @@
 <template>
-  <nav-component/>
+  <nav-component />
   <div class="appointments p-4">
     <div class="card">
-        <div class="card-body">
-            <div class="overflow-hidden mb-2">
-              <input type="email" class="form-control w-25 float-start" placeholder="Search User" v-model="searchValue">
-              <button @click="editAddUser" type="button" class="btn btn-primary float-end me-2 btn-sm"><font-awesome-icon :icon="['fa', 'plus']" /> Add User</button>
-              <div class="form-check form-switch float-end me-4">
-                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault1" v-model="showOnlyPatients">
-                <label class="form-check-label" for="flexSwitchCheckDefault1"> Show Patients</label>
-              </div>
-              <div class="form-check form-switch float-end me-4">
-                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault2" v-model="showOnlyAdmins">
-                <label class="form-check-label" for="flexSwitchCheckDefault2"> Show Admins</label>
-              </div>
-            </div>
-            <table class="table table-striped" style="font-size:14px">
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">User Level</th>
-                    <th scope="col">Contact Number</th>
-                    <th scope="col">Address</th>
-                    <th scope="col">Gender</th>
-                    <th scope="col">Marital Status</th>
-                    <th scope="col">DOB</th>
-                    <th scope="col">Age</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="user in allUsers" :key="user.id">
-                    <td><img src="../../resources/avatar.svg" class="rounded-circle me-2" style="height:30px"> {{user.fullName}}</td>
-                    <td>{{user.user_email}}</td>
-                    <td>
-                      <span class="badge bg-primary rounded-pill" style="font-size:12px" v-if="user.user_level == '3'">{{user.level}}</span>
-                      <span class="badge bg-info rounded-pill" style="font-size:12px" v-if="user.user_level == '2'">{{user.level}}</span>
-                      <span class="badge bg-warning rounded-pill" style="font-size:12px" v-if="user.user_level == '1'">{{user.level}}</span>
-                      <span class="badge bg-secondary rounded-pill" style="font-size:12px" v-if="user.user_level == '0'">{{user.level}}</span>
-                    </td>
-                    <td>{{user.user_contactnum}}</td>
-                    <td><span v-if="user.user_address">{{user.user_address}}, {{user.user_city}} {{user.user_province}}</span><span v-else>-</span></td>
-                    <td>
-                      <span class="badge rounded-pill bg-primary" v-if="user.user_sex == '1'">{{user.sex}}</span>
-                      <span class="badge rounded-pill bg-pink" v-else>{{user.sex}}</span>
-                    </td>
-                    <td>
-                      <span class="badge rounded-pill bg-secondary" v-if="user.user_maritalstatus == '1'">{{user.martial_status}}</span>
-                      <span class="badge rounded-pill bg-warning" v-else-if="user.user_maritalstatus == '2'">{{user.martial_status}}</span>
-                      <span v-else>{{user.martial_status}}</span>
-                    </td>
-                    <td>{{user.user_dob}}</td>
-                    <td>{{user.age}}</td>
-                    <td>
-                      <button type="button" @click="editAddUser(user)" class="btn btn-primary btn-sm me-2" title="Edit user"><font-awesome-icon :icon="['fa', 'pen']" /></button>
-                      <!-- <button type="button" @click="onclickDeleteUser(user)" class="btn btn-danger btn-sm me-2" title="Remove user"><font-awesome-icon :icon="['fa', 'trash-can']" /></button> -->
-                    </td>
-                  </tr>
-                </tbody>
-            </table>
+      <div class="card-body">
+        <div class="overflow-hidden mb-2">
+          <input type="email" class="form-control w-25 float-start" placeholder="Search User" v-model="searchValue">
+          <button @click="editAddUser" type="button" class="btn btn-primary float-end me-2 btn-sm">
+            <font-awesome-icon :icon="['fa', 'plus']" /> Add User
+          </button>
+          <div class="form-check form-switch float-end me-4">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault1" v-model="showOnlyPatients">
+            <label class="form-check-label" for="flexSwitchCheckDefault1"> Show Patients</label>
+          </div>
+          <div class="form-check form-switch float-end me-4">
+            <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault2" v-model="showOnlyAdmins">
+            <label class="form-check-label" for="flexSwitchCheckDefault2"> Show Admins</label>
+          </div>
         </div>
+        <table class="table table-striped" style="font-size:14px">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">User Level</th>
+              <th scope="col">Contact Number</th>
+              <th scope="col">Address</th>
+              <th scope="col">Gender</th>
+              <th scope="col">Marital Status</th>
+              <th scope="col">DOB</th>
+              <th scope="col">Age</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in allUsers" :key="user.id">
+              <td><img src="../../resources/avatar.svg" class="rounded-circle me-2" style="height:30px">
+                {{user.fullName}}
+                <font-awesome-icon
+                @click="viewAppointmentHistory(user)"
+                :icon="['fa', 'external-link-alt']" class="ms-2" v-if="user.user_level == 0"/></td>
+              <td>{{user.user_email}}</td>
+              <td>
+                <span class="badge bg-primary rounded-pill" style="font-size:12px"
+                  v-if="user.user_level == '3'">{{user.level}}</span>
+                <span class="badge bg-info rounded-pill" style="font-size:12px"
+                  v-if="user.user_level == '2'">{{user.level}}</span>
+                <span class="badge bg-warning rounded-pill" style="font-size:12px"
+                  v-if="user.user_level == '1'">{{user.level}}</span>
+                <span class="badge bg-secondary rounded-pill" style="font-size:12px"
+                  v-if="user.user_level == '0'">{{user.level}}</span>
+              </td>
+              <td>{{user.user_contactnum}}</td>
+              <td><span v-if="user.user_address">{{user.user_address}}, {{user.user_city}}
+                  {{user.user_province}}</span><span v-else>-</span></td>
+              <td>
+                <span class="badge rounded-pill bg-primary" v-if="user.user_sex == '1'">{{user.sex}}</span>
+                <span class="badge rounded-pill bg-pink" v-else>{{user.sex}}</span>
+              </td>
+              <td>
+                <span class="badge rounded-pill bg-secondary"
+                  v-if="user.user_maritalstatus == '1'">{{user.martial_status}}</span>
+                <span class="badge rounded-pill bg-warning"
+                  v-else-if="user.user_maritalstatus == '2'">{{user.martial_status}}</span>
+                <span v-else>{{user.martial_status}}</span>
+              </td>
+              <td>{{user.user_dob}}</td>
+              <td>{{user.age}}</td>
+              <td>
+                <button type="button" @click="editAddUser(user)" class="btn btn-primary btn-sm me-2" title="Edit user">
+                  <font-awesome-icon :icon="['fa', 'pen']" />
+                </button>
+                <button type="button" @click="onclickDeleteUser(user)" class="btn btn-danger btn-sm me-2"
+                  title="Remove user">
+                  <font-awesome-icon :icon="['fa', 'trash-can']" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -138,7 +156,7 @@
                         <input type="date" class="form-control" v-model="eaUserDOB">
                       </div>
                     </td>
-                    <td >
+                    <td>
                       <div class="mb-3">
                         <label style="font-size: 14px" class="form-label fw-bold">Sex</label>
                         <select class="form-select" v-model="eaUserSex">
@@ -172,7 +190,8 @@
               <li class="list-group-item">
                 <div class="mb-3">
                   <label style="font-size: 14px" class="form-label fw-bold">Address</label>
-                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" v-model="eaUserAddress"></textarea>
+                  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
+                    v-model="eaUserAddress"></textarea>
                 </div>
               </li>
               <li class="list-group-item">
@@ -198,13 +217,53 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <span v-if="selectedUserItem">
-                <button type="button"  @click="performUserEdit" class="btn btn-primary">Save changes</button>
+              <button type="button" @click="performUserEdit" class="btn btn-primary">Save changes</button>
             </span>
             <span v-else>
-                <button type="submit" class="btn btn-primary">Save changes</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
             </span>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="appointmentHistory">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Appointment History - <span class="badge rounded-pill bg-primary ms-2">{{historyModalName}}</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-striped" style="font-size:14px" v-if="allAppointments.length">
+              <thead>
+                <tr>
+                  <th scope="col">Agenda</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Time Slot</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="app in allAppointments" :key="app.id">
+                  <td>{{app.agendaTitle}}</td>
+                  <td>{{app.convertedDate}}</td>
+                  <td>{{app.timeSlot}}</td>
+                  <td>
+                    <span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span>
+                    <span class="badge rounded-pill bg-primary" v-if="app.app_status == 1">Doctor's Queue</span>
+                    <span class="badge rounded-pill bg-secondary" v-if="app.app_status == 0">Created</span>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+          <span v-if="!allAppointments.length">
+            No records found.
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -271,7 +330,10 @@ export default {
       eaUserContactNum: null,
       eaUserEmail: null,
       eaUserPassword: null,
-      eaMaritalStatus: 0
+      eaMaritalStatus: 0,
+
+      allAppointments: [],
+      historyModalName: null
     }
   },
   methods: {
@@ -281,6 +343,56 @@ export default {
       } else {
         this.allUsers = this.allUsersTemp;
       }
+    },
+    getAllAppointments: function(user) {
+      this.allAppointments = [];
+      var url = 'appointment.rest.php?type=alladdreesedbyId&userId=' + user.id;
+      axios.get(SettingsConstants.BASE_URL + url, { crossdomain: true })
+          .then(function (response) {
+              if (response.data) {
+                  this.allAppointments = response.data;
+                  this.allAppointments.forEach(function(app) {
+                    app.agendaTitle = null;
+                    app.timeSlot = null;
+                    app.fullName = null;
+                    app.fullName = this.sessionData.user_lastname + ', ' + this.sessionData.user_firstname + (this.sessionData.user_middlename ? ' '+this.sessionData.user_middlename : '');
+                    switch(parseInt(app.app_apptype)){
+                      case AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.CHECKUP.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.CHECKUP.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.API.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.API.TITLE
+                        break;
+                      case AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.TITLE
+                        break;
+                    }
+                    this.appointmentSlots.forEach( function (slot){
+                      if (slot.slotid == app.app_timeslot) {
+                        app.timeSlot = slot.sched;
+                        app.timeStart = slot.timestart;
+                        app.timeEnd = slot.timeend;
+                      }
+                    }.bind(app));
+                    app.convertedDate = moment(app.app_date).format('LL');
+                  }.bind(this));
+              }
+          }.bind(this));
+    },
+    viewAppointmentHistory: function (user) {
+      this.historyModalName = user.fullName;
+      this.historyModal = new Modal(document.getElementById('appointmentHistory'));
+      this.historyModal.toggle();
+      axios.get(SettingsConstants.BASE_URL + 'schedule.rest.php?type=all', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.appointmentSlots = response.data;
+              this.getAllAppointments(user);
+            }
+          }.bind(this));
     },
     editAddUser: function (user) {
       this.editAddModal = new Modal(document.getElementById('editAddUser'));
@@ -452,10 +564,10 @@ export default {
                     }
                     switch (patient.user_sex) {
                       case AppConstants.USER_SEX.MALE.VALUE.toString():
-                        patient.sex = AppConstants.USER_SEX.MALE.TITLE;
+                        patient.sex = 'M';
                         break;
                       case AppConstants.USER_SEX.FEMALE.VALUE.toString():
-                        patient.sex = AppConstants.USER_SEX.FEMALE.TITLE;
+                        patient.sex = 'F';
                         break;
                     }
                     switch (patient.user_maritalstatus.toString()) {
