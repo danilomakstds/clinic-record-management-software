@@ -153,7 +153,7 @@
               </ion-item>
               <ion-item>
                 <ion-label>
-                  <h5 class="mb-2"><strong>Symptopms / Concerns / More Information</strong></h5>
+                  <h5 class="mb-2"><strong>Symptoms / Concerns / More Information</strong></h5>
                   <textarea class="form-control" v-model="patientSymptoms" rows="3"></textarea>
                 </ion-label>
               </ion-item>

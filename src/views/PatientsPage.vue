@@ -755,26 +755,17 @@ export default defineComponent({
                     app.fullName = null;
                     app.fullName = patient.user_lastname + ', ' + patient.user_firstname + (patient.user_middlename ? ' '+patient.user_middlename : '');
                     switch(parseInt(app.app_apptype)){
-                      case AppConstants.APPOINTMENT_SERVICES.LABOR.VALUE:
-                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.LABOR.TITLE
-                        break;
                       case AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.VALUE:
                         app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.TITLE
                         break;
                       case AppConstants.APPOINTMENT_SERVICES.CHECKUP.VALUE:
                         app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.CHECKUP.TITLE
                         break;
-                      case AppConstants.APPOINTMENT_SERVICES.COVID_VACCINE.VALUE:
-                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.COVID_VACCINE.TITLE
+                      case AppConstants.APPOINTMENT_SERVICES.API.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.API.TITLE
                         break;
-                      case AppConstants.APPOINTMENT_SERVICES.ANTI_RABIES.VALUE:
-                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.ANTI_RABIES.TITLE
-                        break;
-                      case AppConstants.APPOINTMENT_SERVICES.ANTI_TETANUS.VALUE:
-                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.ANTI_TETANUS.TITLE
-                        break;
-                      case AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.VALUE:
-                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.DEPO_PROVERA.TITLE
+                      case AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.VALUE:
+                        app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.TITLE
                         break;
                     }
                     this.appointmentSlots.forEach( function (slot){

@@ -140,6 +140,7 @@ export default {
         labels: [],
         datasets: [
           {
+            label: '',
             data: [],
             backgroundColor: ['#198754','#fd7e14','#d63384', '#0d6efd', '#6f42c1', '#0DCAF0', '#DC3545', '#FFF3CD', '#A3CFBB', '#A6E9D5', '#ccc', '#E9ECEF', '#CFF4FC', '#842029', '#801F4F']
           }

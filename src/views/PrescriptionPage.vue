@@ -508,7 +508,7 @@ export default defineComponent({
           .then(function (response) {
             if (response.data) {
               this.appointmentSlots = response.data;
-              this.getAllAppointments();
+              //this.getAllAppointments();
             }
           }.bind(this));
     },
