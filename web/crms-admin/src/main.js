@@ -13,7 +13,7 @@ import {
     faChartLine, faFileInvoiceDollar, faMoneyCheckDollar, faCalendarMinus,
     faCalendarXmark, faClockFour, faMugHot, faGift, faUserGroup, faUserGear,
     faCakeCandles, faHourglassEnd, faUserPen, faPen, faBan, faTrashCan, faComment,
-    faEye, faPrint, faCapsules, faExternalLinkAlt
+    faEye, faPrint, faCapsules, faExternalLinkAlt, faFileContract
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(faPhone, faCartShopping, faCheck, faCartArrowDown, faBars,
@@ -22,6 +22,6 @@ library.add(faPhone, faCartShopping, faCheck, faCartArrowDown, faBars,
     faChartLine, faFileInvoiceDollar, faMoneyCheckDollar, faCalendarMinus,
     faCalendarXmark, faClockFour, faMugHot, faGift, faUserGroup, faUserGear,
     faCakeCandles, faHourglassEnd, faUserPen, faPen, faBan, faTrashCan, faComment,
-    faEye, faPrint, faCapsules, faExternalLinkAlt);
+    faEye, faPrint, faCapsules, faExternalLinkAlt, faFileContract);
 
 createApp(App).use(store).use(router).use(Donut).component("font-awesome-icon", FontAwesomeIcon).mount('#app')

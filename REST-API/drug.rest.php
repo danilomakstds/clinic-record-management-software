@@ -108,6 +108,20 @@ switch ($_GET['type']) {
          print(0);
       }
       break;
+   case 'getallrecordsbymonth':
+      $sqlString = "SELECT id, drugid, sum(quantity) as sum_quantity FROM `drug_quantity_tracker` WHERE date_created LIKE '{$_GET['month']}%' GROUP BY drugid";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
 }
 mysqli_close($con);
 ?>

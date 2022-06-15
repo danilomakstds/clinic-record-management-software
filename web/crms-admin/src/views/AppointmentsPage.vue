@@ -66,6 +66,11 @@
                       title="Remove appointment">
                       <font-awesome-icon :icon="['fa', 'trash-can']" />
                     </button>
+                    <button @click="viewPrescription(app)" :disabled="app.app_status != 2 || app.app_apptype > 2" data-bs-toggle="modal"
+                      data-bs-target="#showPrescriptionModal" type="button" class="btn btn-success btn-sm me-2"
+                      title="View Prescription">
+                      <font-awesome-icon :icon="['fa', 'file-contract']" />
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -149,6 +154,7 @@
 
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -265,6 +271,48 @@
     </div>
   </div>
 
+  <div class="modal fade" id="showPrescriptionModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" v-if="viewedAppointment">
+        <div class="modal-header">
+          <h5 class="modal-title">Appointment # {{viewedAppointment.id}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="prescriptionPrinting">
+          <div style="border: 1px solid #555; width: 600px; margin: 0 auto" class="p-5">
+            <h4 style="color: #00ACC1" class="text-center"><strong>{{this.clinicName}}</strong></h4>
+            <div class="row" style="border-bottom: 5px solid #00ACC1">
+              <div class="col-md-6">Dra. Beth G. Catacutan<p class="text-muted" style="font-size: 13px">{{this.clinicAddress}}</p></div>
+              <div class="col-md-6 text-end">
+                <span class="text-muted" style="font-size: 13px">PH: (123) 808 2014 2015</span><br/>
+                <span class="text-muted" style="font-size: 13px">FAX: (123) 808 2015 2202</span>
+              </div>
+            </div>
+            <div class="mt-3">
+                <strong>Patient Name</strong>: <span class="me-3">{{viewedAppointment.fullName}}</span>
+                <strong>Age</strong>: <span class="me-3">{{viewedAppointment.patientAge}}</span>
+                <strong>Gender</strong>: <span class="text-decoration-underline">{{viewedAppointment.patientGender}}</span><br/>
+                <strong>Address</strong>: <span class="me-1">{{viewedAppointment.userAddress}}</span><br/>
+                <strong>Date</strong>: <span class="text-decoration-underline">{{viewedAppointment.app_date}}</span>
+            </div>
+            <div class="mt-3" style="height: 350px; border-bottom: 5px solid #00ACC1">
+              <h1><strong style="font-size: 50px">R</strong><strong style="font-size: 14px">x</strong></h1>
+              <p>{{viewedAppointment.app_prescription}}</p>
+            </div>
+            <div class="mt-3">
+              Doctor's Signature: <span class="me-2"><img src="https://norsucrms.000webhostapp.com/REST-API/signature.png" style="height: 80px"/></span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="printPrescription()">
+          <font-awesome-icon :icon="['fa', 'print']" class="me-2" /> Print</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 
@@ -280,6 +328,7 @@ import NavComponent from '../components/NavComponent.vue'
 import Swal from 'sweetalert2'
 import appConstants from '../constants/app.constants'
 import { Modal } from 'bootstrap'
+import settingsConstants from '@/constants/settings.constants'
 
 export default {
   components: { NavComponent },
@@ -319,7 +368,9 @@ export default {
       timeslotName: null,
       editAddModal: null,
       isEditSchedule: false,
-      selectedforEdit: null
+      selectedforEdit: null,
+      clinicName: null,
+      clinicAddress: null
     }
   },
   methods: {
@@ -371,6 +422,20 @@ export default {
                     if (response.data) {
                       var resp = response.data[0];
                       app.fullName = resp.user_lastname + ', ' + resp.user_firstname + (resp.user_middlename ? ' '+resp.user_middlename : '');
+                      app.userAddress = resp.user_address + ', ' + resp.user_city + ', ' + resp.user_province;
+                      app.patientAge = null;
+                      if (resp.user_dob) {
+                        if ((moment(resp.user_dob, 'YYYYMMDD').fromNow()).includes('years')) {
+                          app.patientAge = (moment(resp.user_dob, 'YYYYMMDD').fromNow()).split(" ")[0];
+                        } else {
+                          if ((moment(resp.user_dob, 'YYYYMMDD').fromNow()).includes('month')) {
+                            app.patientAge = parseInt(moment(resp.user_dob, 'YYYYMMDD').fromNow().split(" ")[0]).toString() + ' months/old';
+                          } else {
+                            app.patientAge = '< 1 month old';
+                          }
+                        }
+                      }
+                      app.patientGender = (resp.user_sex == '1') ? 'Male':'Female';
                     }
                   }.bind(app));
                   switch(parseInt(app.app_apptype)){
@@ -460,6 +525,25 @@ export default {
     },
     viewAppointment: function (app) {
       this.viewedAppointment = app;
+    },
+    viewPrescription: function (app) {
+      this.viewedAppointment = app;
+    },
+    printPrescription: function () {
+      var divToPrint = document.getElementById("prescriptionPrinting");
+      var newWin = window.open('', '', 'height=600,width=1000');
+      newWin.document.write('<head><title>Prescription'+this.viewedAppointment.id+'-'+this.viewedAppointment.fullName+'</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"' +
+          'integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">');
+      //newWin.document.write('<style> #payslip-table {border: 1px solid #ccc;} #payslip-table tr td {border: 1px solid #ccc; padding: 10px;}</style></head>');
+      setTimeout(function () {
+          newWin.document.write(divToPrint.outerHTML);
+          newWin.document.close();
+          newWin.focus();
+          newWin.print();
+          setTimeout(function () {
+              newWin.close();
+          }, 500);
+      }, 500);
     },
     editAppointment: function (app) {
       this.editedAppointment = app;
@@ -625,6 +709,8 @@ export default {
     this.getAllSchedule();
     this.getAllWorkDays();
     this.daysConstant = appConstants.DAYS;
+    this.clinicName = settingsConstants.CLINIC_NAME;
+    this.clinicAddress = settingsConstants.CLINIC_ADDRESS;
   },
 }
 </script>
