@@ -246,6 +246,20 @@ switch ($_GET['type']) {
       $rs = mysqli_query($con, $sqlString);
       echo(mysqli_affected_rows($con));
       break;
+   case 'getallrecordsbymonth':
+      $sqlString = "SELECT * FROM `appointment` WHERE `app_date` LIKE '{$_GET['month']}%' AND `app_apptype` = '{$_GET['app_apptype']}' AND `app_status` = '2'";
+      $rs = mysqli_query($con, $sqlString);
+      
+      if(mysqli_num_rows($rs) > 0){
+         while($objRs = mysqli_fetch_array($rs)){
+            $output[] = $objRs;
+         }
+         $json = json_encode($output);
+         print($json);
+      } else {
+         print(0);
+      }
+      break;
 }
 mysqli_close($con);
 ?>

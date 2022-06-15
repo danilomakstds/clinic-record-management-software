@@ -13,6 +13,10 @@
             <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule" type="button"
               role="tab" aria-controls="schedule" aria-selected="false">Schedule</button>
           </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button"
+              role="tab" aria-controls="report" aria-selected="false">Reports</button>
+          </li>
         </ul>
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -152,6 +156,120 @@
               </div>
             </div>
 
+          </div>
+          <div class="tab-pane fade" id="report" role="tabpanel" aria-labelledby="report-tab">
+            <div class="input-group mb-3 mt-3 w-25 float-end">
+              <select class="form-select" aria-label="Default select example" v-model="selectedMonth">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+              </select>
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal" @click="printRecords()">
+              <font-awesome-icon :icon="['fa', 'print']" class="me-2" /> Print</button>
+            </div>
+
+            <table class="table table-striped" style="font-size:14px" id="appointmentForPrinting">
+                <thead>
+                  <tr>
+                    <td colspan="5" style="font-size: 16px"><strong>Prenatal Care</strong></td>
+                  </tr>
+                  <tr>
+                    <th scope="col">Patient</th>
+                    <th scope="col">Appointment #</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time Slot</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="mb-5">
+                  <tr v-for="app in prenatalList" :key="app.id">
+                    <td><img src="../../resources/avatar.svg" style="height:35px"
+                      class="rounded-circle me-2">{{app.fullName}}</td>
+                      <td>{{app.id}}</td>
+                    <td>{{app.convertedDate}}</td>
+                    <td>{{app.timeSlot}}</td>
+                    <td><span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span></td>
+                  </tr>
+                </tbody>
+                <thead>
+                  <tr>
+                    <td colspan="5" style="font-size: 16px"><strong>Checkup / Consultation</strong></td>
+                  </tr>
+                  <tr>
+                    <th scope="col">Patient</th>
+                    <th scope="col">Appointment #</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time Slot</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="mb-5">
+                  <tr v-for="app in consultationList" :key="app.id">
+                    <td><img src="../../resources/avatar.svg" style="height:35px"
+                      class="rounded-circle me-2">{{app.fullName}}</td>
+                      <td>{{app.id}}</td>
+                    <td>{{app.convertedDate}}</td>
+                    <td>{{app.timeSlot}}</td>
+                    <td><span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span></td>
+                  </tr>
+                </tbody>
+
+
+                <thead>
+                  <tr>
+                    <td colspan="5" style="font-size: 16px"><strong>API Immunization</strong></td>
+                  </tr>
+                  <tr>
+                    <th scope="col">Patient</th>
+                    <th scope="col">Appointment #</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time Slot</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="mb-5">
+                  <tr v-for="app in apiList" :key="app.id">
+                    <td><img src="../../resources/avatar.svg" style="height:35px"
+                      class="rounded-circle me-2">{{app.fullName}}</td>
+                      <td>{{app.id}}</td>
+                    <td>{{app.convertedDate}}</td>
+                    <td>{{app.timeSlot}}</td>
+                    <td><span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span></td>
+                  </tr>
+                </tbody>
+
+                <thead>
+                  <tr>
+                    <td colspan="5" style="font-size: 16px"><strong>Family Planning</strong></td>
+                  </tr>
+                  <tr>
+                    <th scope="col">Patient</th>
+                    <th scope="col">Appointment #</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time Slot</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="mb-5">
+                  <tr v-for="app in familyPlanningList" :key="app.id">
+                    <td><img src="../../resources/avatar.svg" style="height:35px"
+                      class="rounded-circle me-2">{{app.fullName}}</td>
+                      <td>{{app.id}}</td>
+                    <td>{{app.convertedDate}}</td>
+                    <td>{{app.timeSlot}}</td>
+                    <td><span class="badge rounded-pill bg-success" v-if="app.app_status == 2">Done</span></td>
+                  </tr>
+                </tbody>
+            </table>
           </div>
         </div>
 
@@ -344,6 +462,13 @@ export default {
     searchValue: function (newVal) {
       this.allAppointments = this.allAppointmentsTemp;
       this.applySearch(newVal);
+    },
+    selectedMonth: function () {
+      this.getAllAppointmentsPerService();
+      this.prenatalList = [];
+      this.apiList = [];
+      this.consultationList = [];
+      this.familyPlanningList = [];
     }
   },
   data() {
@@ -370,7 +495,14 @@ export default {
       isEditSchedule: false,
       selectedforEdit: null,
       clinicName: null,
-      clinicAddress: null
+      clinicAddress: null,
+      monthList: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      selectedMonth: null,
+      serviceList: ['Prenatal Care', 'Checkup / Consultation', 'API Immunization', 'Family Planning'],
+      prenatalList: [],
+      consultationList: [],
+      apiList: [],
+      familyPlanningList: []
     }
   },
   methods: {
@@ -399,6 +531,108 @@ export default {
               this.getAllAppointments();
             }
           }.bind(this));
+    },
+    printRecords: function () {
+      var m = (parseInt(this.selectedMonth)+1).toString().length == 1 ? '0'+(parseInt(this.selectedMonth)+1).toString(): (parseInt(this.selectedMonth)+1).toString();
+      var searchQuery = (new Date()).getFullYear()+'-'+m;
+      var divToPrint = document.getElementById("appointmentForPrinting");
+      var newWin = window.open('', '', 'height=600,width=1000');
+      newWin.document.write('<head><title>AppointmentRecords-'+searchQuery+'</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"' +
+          'integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">');
+      //newWin.document.write('<style> #payslip-table {border: 1px solid #ccc;} #payslip-table tr td {border: 1px solid #ccc; padding: 10px;}</style></head>');
+      setTimeout(function () {
+          newWin.document.write(divToPrint.outerHTML);
+          newWin.document.close();
+          newWin.focus();
+          newWin.print();
+          setTimeout(function () {
+              newWin.close();
+          }, 500);
+      }, 500);
+    },
+    getAllAppointmentsPerService: function () {
+      var m = (parseInt(this.selectedMonth)+1).toString().length == 1 ? '0'+(parseInt(this.selectedMonth)+1).toString(): (parseInt(this.selectedMonth)+1).toString();
+      var searchQuery = (new Date()).getFullYear()+'-'+m;
+      var url = 'appointment.rest.php?type=getallrecordsbymonth&month='+searchQuery+'&app_apptype=';
+        axios.get(SettingsConstants.BASE_URL + url+'1', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.prenatalList = this.formatData(response.data);
+            }
+        }.bind(this));
+
+        axios.get(SettingsConstants.BASE_URL + url+'2', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.consultationList = this.formatData(response.data);
+            }
+        }.bind(this));
+
+        axios.get(SettingsConstants.BASE_URL + url+'3', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.apiList = this.formatData(response.data);
+            }
+        }.bind(this));
+
+        axios.get(SettingsConstants.BASE_URL + url+'4', { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              this.familyPlanningList = this.formatData(response.data);
+            }
+        }.bind(this));
+    },
+    formatData: function (data) {
+      data.forEach(function(app) {
+          app.agendaTitle = null;
+          app.timeSlot = null;
+          app.fullName = null;
+          (this.sessionData.user_level == 2) ? app.disabledPrescription = false: app.disabledPrescription = true;
+          axios.get(SettingsConstants.BASE_URL + 'users.rest.php?type=nameonly&userId=' + app.app_userId, { crossdomain: true })
+          .then(function (response) {
+            if (response.data) {
+              var resp = response.data[0];
+              app.fullName = resp.user_lastname + ', ' + resp.user_firstname + (resp.user_middlename ? ' '+resp.user_middlename : '');
+              app.userAddress = resp.user_address + ', ' + resp.user_city + ', ' + resp.user_province;
+              app.patientAge = null;
+              if (resp.user_dob) {
+                if ((moment(resp.user_dob, 'YYYYMMDD').fromNow()).includes('years')) {
+                  app.patientAge = (moment(resp.user_dob, 'YYYYMMDD').fromNow()).split(" ")[0];
+                } else {
+                  if ((moment(resp.user_dob, 'YYYYMMDD').fromNow()).includes('month')) {
+                    app.patientAge = parseInt(moment(resp.user_dob, 'YYYYMMDD').fromNow().split(" ")[0]).toString() + ' months/old';
+                  } else {
+                    app.patientAge = '< 1 month old';
+                  }
+                }
+              }
+              app.patientGender = (resp.user_sex == '1') ? 'Male':'Female';
+            }
+          }.bind(app));
+          switch(parseInt(app.app_apptype)){
+            case AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.VALUE:
+              app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.PRENATAL_CARE.TITLE
+              break;
+            case AppConstants.APPOINTMENT_SERVICES.CHECKUP.VALUE:
+              app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.CHECKUP.TITLE
+              break;
+            case AppConstants.APPOINTMENT_SERVICES.API.VALUE:
+              app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.API.TITLE
+              break;
+            case AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.VALUE:
+              app.agendaTitle = AppConstants.APPOINTMENT_SERVICES.FAMILY_PLANNING.TITLE
+              break;
+          }
+          this.appointmentSlots.forEach( function (slot){
+              if (slot.slotid == app.app_timeslot) {
+                app.timeSlot = slot.sched;
+                app.timeStart = slot.timestart;
+                app.timeEnd = slot.timeend;
+              }
+            }.bind(app));
+          app.convertedDate = moment(app.app_date).format('LL');
+        }.bind(this));
+        return data;
     },
     getAllAppointments: function() {
       var today = moment().format().split('T')[0];
@@ -711,6 +945,7 @@ export default {
     this.daysConstant = appConstants.DAYS;
     this.clinicName = settingsConstants.CLINIC_NAME;
     this.clinicAddress = settingsConstants.CLINIC_ADDRESS;
+    this.selectedMonth = (new Date()).getMonth();
   },
 }
 </script>
